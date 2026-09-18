@@ -1426,3 +1426,798 @@ footer p {
 
 }
 
+/* =====================================================
+   PREMIUM UI REFINEMENT
+===================================================== */
+
+:root {
+  --bg: #050806;
+  --bg-light: #0a110d;
+  --card: #0d1511;
+  --card-hover: #111d16;
+  --green: #72f58a;
+  --green-dark: #193d29;
+  --white: #f4f8f5;
+  --text: #d6dfd9;
+  --muted: #84928a;
+  --red: #ff5266;
+  --border: rgba(201, 231, 211, 0.11);
+  --border-strong: rgba(114, 245, 138, 0.28);
+  --radius-lg: 20px;
+  --radius-md: 14px;
+}
+
+body {
+  overflow-x: hidden;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 82% 4%, rgba(52, 130, 77, 0.15), transparent 25rem),
+    radial-gradient(circle at 12% 38%, rgba(27, 78, 49, 0.1), transparent 28rem),
+    linear-gradient(180deg, #070b08 0%, #040605 100%);
+}
+
+.topbar {
+  height: 76px;
+  padding: 0 max(24px, calc((100vw - 1240px) / 2));
+  background: rgba(5, 8, 6, 0.78);
+  border-bottom-color: rgba(201, 231, 211, 0.13);
+}
+
+.brand {
+  gap: 8px;
+  font-size: 19px;
+  letter-spacing: 0.5px;
+}
+
+.brand:first-letter {
+  font-size: 23px;
+}
+
+nav {
+  gap: 34px;
+  margin-left: auto;
+  margin-right: 42px;
+}
+
+nav a {
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.live-badge,
+.score-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 82, 102, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 82, 102, 0.07);
+  color: #ff8090;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+main {
+  width: min(1240px, calc(100% - 48px));
+  padding-bottom: 96px;
+}
+
+.hero {
+  min-height: 390px;
+  margin-top: 32px;
+  border-color: var(--border);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(112deg, rgba(9, 22, 14, 0.98) 0%, rgba(9, 20, 14, 0.9) 56%, rgba(12, 29, 18, 0.68) 100%),
+    radial-gradient(circle at 84% 50%, rgba(114, 245, 138, 0.2), transparent 29%),
+    #09110c;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.hero::before {
+  width: 460px;
+  height: 460px;
+  right: -160px;
+  top: -130px;
+  border-color: rgba(114, 245, 138, 0.12);
+  box-shadow: 0 0 0 40px rgba(114, 245, 138, 0.025), 0 0 0 80px rgba(114, 245, 138, 0.018);
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.25;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(90deg, black, transparent 72%);
+}
+
+.hero-content {
+  padding: 68px 72px;
+}
+
+.tag {
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+}
+
+.hero h1 {
+  max-width: 650px;
+  font-size: clamp(44px, 6vw, 76px);
+  line-height: 0.98;
+  letter-spacing: -3.5px;
+}
+
+.hero-description {
+  max-width: 485px;
+  margin-top: 24px;
+  font-size: 14px;
+}
+
+.hero-button {
+  margin-top: 30px;
+  padding: 14px 20px;
+  border-radius: 9px;
+  box-shadow: 0 10px 30px rgba(114, 245, 138, 0.16);
+}
+
+.hero-ball {
+  position: relative;
+  z-index: 1;
+  width: 260px;
+  height: 260px;
+  margin-right: 42px;
+  border: 1px solid rgba(114, 245, 138, 0.12);
+  background: radial-gradient(circle, rgba(114, 245, 138, 0.2), rgba(114, 245, 138, 0.04) 48%, transparent 69%);
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.28));
+}
+
+.section {
+  margin-top: 58px;
+}
+
+.section-title {
+  margin-bottom: 20px;
+}
+
+.section-title small {
+  margin-bottom: 7px;
+  font-size: 9px;
+  letter-spacing: 2.4px;
+}
+
+.section-title h2 {
+  font-size: 29px;
+  letter-spacing: -1px;
+}
+
+#viewerCount {
+  padding: 9px 13px;
+  border-radius: 999px;
+  color: var(--text);
+  background: rgba(114, 245, 138, 0.07);
+  border-color: rgba(114, 245, 138, 0.16);
+}
+
+.player-box {
+  border-color: rgba(114, 245, 138, 0.2);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 0 5px rgba(114, 245, 138, 0.025), 0 28px 80px rgba(0, 0, 0, 0.45);
+}
+
+.player-overlay {
+  background: linear-gradient(180deg, rgba(2, 6, 3, 0.15), rgba(2, 6, 3, 0.82));
+}
+
+.big-play {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 17px;
+  box-shadow: 0 10px 35px rgba(114, 245, 138, 0.25);
+}
+
+.now-playing,
+.live-scoreboard,
+.match-card,
+.tournament-card,
+.info-card {
+  background: linear-gradient(145deg, rgba(18, 29, 22, 0.94), rgba(9, 15, 11, 0.96));
+  border-color: var(--border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+}
+
+.now-playing {
+  min-height: 76px;
+  margin-top: 16px;
+  padding: 18px 22px;
+  border-radius: var(--radius-md);
+}
+
+.now-playing h2 {
+  font-size: 19px;
+}
+
+.player-status {
+  padding: 7px 10px;
+  border: 1px solid rgba(114, 245, 138, 0.13);
+  border-radius: 999px;
+  background: rgba(114, 245, 138, 0.05);
+  letter-spacing: 0.8px;
+}
+
+.live-scoreboard {
+  margin-top: 20px;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  border-color: rgba(114, 245, 138, 0.18);
+}
+
+.scoreboard-header h2 {
+  font-size: 21px;
+}
+
+.innings-score {
+  padding: 26px 0;
+}
+
+.team-logo {
+  width: 52px;
+  height: 52px;
+  border: 1px solid rgba(114, 245, 138, 0.16);
+  background: rgba(114, 245, 138, 0.08);
+}
+
+.main-score strong {
+  color: var(--green);
+  font-size: 42px;
+  letter-spacing: -1.5px;
+}
+
+.score-detail {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.score-detail strong {
+  font-size: 19px;
+}
+
+.matches-grid,
+.tournament-grid {
+  gap: 18px;
+}
+
+.match-card {
+  min-height: 216px;
+  padding: 21px;
+  border-radius: var(--radius-md);
+}
+
+.match-card:hover,
+.tournament-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--border-strong);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
+}
+
+.live-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #ff8290;
+  letter-spacing: 1px;
+}
+
+.match-league {
+  letter-spacing: 0.8px;
+}
+
+.team {
+  padding: 11px 0;
+}
+
+.team-name {
+  font-size: 17px;
+}
+
+.team-score {
+  color: var(--green);
+  font-size: 14px;
+}
+
+.watch-button,
+#refreshBtn {
+  border: 1px solid rgba(114, 245, 138, 0.18);
+}
+
+.watch-button {
+  margin-top: 17px;
+  padding: 13px;
+}
+
+#refreshBtn {
+  padding: 10px 15px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.tournament-card {
+  min-height: 158px;
+  padding: 23px;
+  border-radius: var(--radius-md);
+}
+
+.tournament-card > div {
+  position: relative;
+  z-index: 1;
+  color: var(--green);
+}
+
+.tournament-card h3,
+.tournament-card p {
+  position: relative;
+  z-index: 1;
+}
+
+.info-section {
+  gap: 16px;
+  margin-top: 42px;
+}
+
+.info-card {
+  padding: 20px;
+  border-radius: var(--radius-md);
+}
+
+footer {
+  padding: 43px 24px;
+  background: #030504;
+}
+
+footer p {
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    padding: 0 24px;
+  }
+
+  nav {
+    margin-right: 24px;
+  }
+
+  .hero-content {
+    padding: 52px 42px;
+  }
+
+  .hero-ball {
+    width: 190px;
+    height: 190px;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 650px) {
+  .topbar {
+    height: 64px;
+    padding: 0 16px;
+  }
+
+  .brand {
+    font-size: 17px;
+  }
+
+  .live-badge {
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+
+  main {
+    width: calc(100% - 28px);
+  }
+
+  .hero {
+    margin-top: 18px;
+    border-radius: 16px;
+  }
+
+  .hero-content {
+    padding: 36px 24px 39px;
+  }
+
+  .hero h1 {
+    font-size: clamp(39px, 12vw, 55px);
+    letter-spacing: -2.5px;
+  }
+
+  .hero-description {
+    max-width: 360px;
+  }
+
+  .section {
+    margin-top: 42px;
+  }
+
+  .section-title h2 {
+    font-size: 23px;
+  }
+
+  .section-title {
+    gap: 12px;
+  }
+
+  #viewerCount {
+    flex-shrink: 0;
+    padding: 8px 10px;
+  }
+
+  .now-playing {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .quick-score {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 0;
+  }
+
+  .player-status {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .now-playing h2,
+  .scoreboard-header h2 {
+    max-width: 190px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .live-scoreboard {
+    padding: 17px;
+    border-radius: 16px;
+  }
+
+  .innings-score {
+    gap: 12px;
+    padding: 22px 0;
+  }
+
+  .batting-team strong {
+    max-width: 145px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .main-score strong {
+    font-size: 31px;
+  }
+
+  .score-details {
+    gap: 7px;
+  }
+
+  .score-detail {
+    padding: 12px 6px;
+  }
+
+  .score-detail strong {
+    font-size: 16px;
+  }
+
+  .player-row {
+    gap: 12px;
+  }
+
+  .player-name {
+    display: block;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero h1 {
+    font-size: 38px;
+  }
+
+  .section-title h2 {
+    font-size: 21px;
+  }
+
+  .section-title small {
+    letter-spacing: 1.8px;
+  }
+
+  #viewerCount {
+    font-size: 9px;
+  }
+
+  .main-score strong {
+    font-size: 27px;
+  }
+
+  .batting-team {
+    gap: 8px;
+  }
+
+  .team-logo {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =====================================================
+   PREMIUM MOTION SYSTEM
+===================================================== */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 15px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes softAppear {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ambientDrift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(1.5%, 1%, 0) scale(1.025);
+  }
+}
+
+@keyframes scoreReveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 5px, 0) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+body::before {
+  position: fixed;
+  inset: -12%;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+  opacity: 0.32;
+  background: radial-gradient(circle at 30% 20%, rgba(114, 245, 138, 0.06), transparent 20%), radial-gradient(circle at 75% 70%, rgba(42, 104, 62, 0.05), transparent 26%);
+  animation: ambientDrift 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+.topbar {
+  animation: softAppear 500ms ease-out both;
+}
+
+.brand {
+  transition: color 220ms ease, transform 220ms ease;
+}
+
+.brand:hover {
+  color: var(--green);
+  transform: translateY(-1px);
+}
+
+.live-badge i,
+.score-live-badge i,
+.player-status i,
+.info-card strong i {
+  animation: livePulse 2.2s ease-in-out infinite;
+}
+
+.hero {
+  animation: fadeUp 600ms 80ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero::before {
+  animation: ambientDrift 14s ease-in-out infinite;
+  will-change: transform;
+}
+
+.hero-text > * {
+  opacity: 0;
+  animation: fadeUp 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-text > :nth-child(1) {
+  animation-delay: 180ms;
+}
+
+.hero-text > :nth-child(2) {
+  animation-delay: 250ms;
+}
+
+.hero-text > :nth-child(3) {
+  animation-delay: 320ms;
+}
+
+.hero-text > :nth-child(4) {
+  animation-delay: 390ms;
+}
+
+.hero-button,
+.watch-button,
+#refreshBtn {
+  transition: transform 180ms ease, box-shadow 220ms ease, border-color 220ms ease, background-color 220ms ease;
+}
+
+.hero-button:hover,
+.watch-button:hover,
+#refreshBtn:hover {
+  transform: translateY(-1px);
+}
+
+.hero-button:active,
+.watch-button:active,
+#refreshBtn:active {
+  transform: translateY(0);
+}
+
+.player-box {
+  animation: softAppear 650ms 260ms ease-out both;
+  transition: border-color 260ms ease, box-shadow 260ms ease;
+}
+
+.player-box:hover {
+  border-color: rgba(114, 245, 138, 0.34);
+  box-shadow: 0 0 0 5px rgba(114, 245, 138, 0.035), 0 28px 80px rgba(0, 0, 0, 0.45);
+}
+
+.player-overlay {
+  transition: opacity 350ms ease;
+}
+
+.now-playing {
+  animation: fadeUp 500ms 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.now-playing h2 {
+  transition: color 250ms ease, opacity 250ms ease;
+}
+
+.live-scoreboard {
+  animation: fadeUp 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.main-score strong {
+  animation: scoreReveal 450ms ease-out both;
+  transition: color 250ms ease, transform 250ms ease;
+}
+
+.score-detail {
+  transition: transform 180ms ease, border-color 220ms ease, background-color 220ms ease;
+}
+
+.score-detail:hover {
+  transform: translateY(-2px);
+  border-color: rgba(114, 245, 138, 0.16);
+  background: rgba(114, 245, 138, 0.055);
+}
+
+.section {
+  animation: fadeUp 520ms 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.section:nth-of-type(2) {
+  animation-delay: 500ms;
+}
+
+.section:nth-of-type(3) {
+  animation-delay: 580ms;
+}
+
+.info-section {
+  animation: fadeUp 520ms 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@supports (animation-timeline: view()) {
+  .section,
+  .info-section {
+    animation-name: fadeUp;
+    animation-duration: 600ms;
+    animation-timeline: view();
+    animation-range: entry 0% cover 22%;
+  }
+}
+
+.match-card,
+.tournament-card {
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease, background-color 220ms ease;
+}
+
+.match-card:focus-within {
+  transform: translateY(-3px);
+  border-color: var(--border-strong);
+  box-shadow: 0 15px 34px rgba(0, 0, 0, 0.24), 0 0 0 3px rgba(114, 245, 138, 0.06);
+}
+
+.match-card:focus-within .live-label {
+  color: var(--green);
+}
+
+.tournament-card:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .topbar,
+  .hero,
+  .hero::before,
+  .hero-text > *,
+  .player-box,
+  .now-playing,
+  .live-scoreboard,
+  .section,
+  .info-section,
+  .main-score strong,
+  .live-badge i,
+  .score-live-badge i,
+  .player-status i,
+  .info-card strong i {
+    animation: none !important;
+  }
+
+  .hero-text > * {
+    opacity: 1;
+  }
+
+  .hero-button:hover,
+  .watch-button:hover,
+  #refreshBtn:hover,
+  .match-card:hover,
+  .match-card:focus-within,
+  .tournament-card:hover,
+  .score-detail:hover {
+    transform: none;
+  }
+}
+
