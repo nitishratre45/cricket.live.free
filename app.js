@@ -1,4 +1,4 @@
-// ======================================================
+﻿// ======================================================
 // CRICKETLIVE
 // ======================================================
 
@@ -173,11 +173,7 @@ function playStream(
 
       lowLatencyMode: false,
 
-      maxBufferLength: 20,
-
-      maxMaxBufferLength: 30,
-
-      liveSyncDurationCount: 3
+      maxBufferLength: 25,`r`n      maxMaxBufferLength: 40,`r`n      liveSyncDurationCount: 3,`r`n      liveMaxLatencyDurationCount: 6,`r`n      maxBufferHole: 0.5
 
     });
 
@@ -209,46 +205,51 @@ function playStream(
     );
 
 
-    hls.on(
-      Hls.Events.ERROR,
-      (_, data) => {
+    hls.on(Hls.Events.ERROR, (_, data) => {
 
-        console.log(
-          "HLS error:",
-          data
+      console.log("HLS error:", data);
+
+      if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+
+        console.log("Recovering media...");
+
+        hls.recoverMediaError();
+
+        return;
+      }
+
+      if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+
+        console.log("Recovering network...");
+
+        setTimeout(() => {
+          hls.startLoad();
+        }, 1000);
+
+        return;
+      }
+
+      if (data.fatal) {
+
+        statusText.textContent = "RECONNECTING";
+
+        showOverlay(
+          "Reconnecting...",
+          "Trying to restore the live stream."
         );
 
+        setTimeout(() => {
 
-        if (data.fatal) {
+          if (hls) {
+            hls.destroy();
+            hls = null;
+          }
 
-          statusText.textContent =
-            "ERROR";
+          playStream(title, url);
 
-          showOverlay(
-            "Stream unavailable",
-            "The stream cannot be played."
-          );
-
-        }
-
+        }, 2000);
       }
-    );
-
-
-    video.addEventListener(
-      "playing",
-      () => {
-
-        hideOverlay();
-
-        statusText.textContent =
-          "LIVE";
-
-      },
-      {
-        once: true
-      }
-    );
+    });
 
   }
 
@@ -333,7 +334,7 @@ function createMatchCard(match) {
     <div class="match-top">
 
       <span class="live-label">
-        🔴 ${match.status}
+        ðŸ”´ ${match.status}
       </span>
 
       <span class="match-league">
@@ -370,7 +371,7 @@ function createMatchCard(match) {
 
 
     <button class="watch-button">
-      ▶ Watch Live
+      â–¶ Watch Live
     </button>
 
   `;
@@ -517,7 +518,7 @@ database
 
 
       viewerCountElement.textContent =
-        `👁 ${count} Watching`;
+        `ðŸ‘ ${count} Watching`;
 
     }
   );
@@ -528,3 +529,5 @@ database
 // ======================================================
 
 loadMatches();
+
+
