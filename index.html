@@ -22,7 +22,7 @@
 </head>
 
 
-<body>
+<body id="top">
 
 
 <!-- =====================================================
@@ -131,6 +131,28 @@
     class="section"
   >
 
+    <div
+      class="premium-live-bar"
+      aria-live="polite"
+    >
+
+      <div class="premium-live-mark">
+        <i></i>
+        <span>LIVE</span>
+      </div>
+
+      <div class="premium-live-copy">
+        <small>NOW STREAMING</small>
+        <strong id="premiumLiveTitle">No match selected</strong>
+      </div>
+
+      <div class="premium-live-meta">
+        <span class="status-line-dot"></span>
+        <span id="premiumLiveState">READY</span>
+      </div>
+
+    </div>
+
     <div class="section-title">
 
       <div>
@@ -184,6 +206,52 @@
         <p id="message">
           Select a live match below.
         </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="player-toolbar">
+
+      <div
+        class="connection-status status-ready"
+        aria-live="polite"
+      >
+        <i></i>
+        <span>CONNECTION <strong id="connectionText">Ready</strong></span>
+      </div>
+
+      <div class="player-actions">
+
+        <button
+          id="theaterToggle"
+          class="player-action"
+          type="button"
+          aria-pressed="false"
+          aria-label="Toggle theater mode"
+        >
+          [ ] Theater
+        </button>
+
+        <button
+          id="focusToggle"
+          class="player-action"
+          type="button"
+          aria-pressed="false"
+          aria-label="Toggle focus mode"
+        >
+          + Focus
+        </button>
+
+        <button
+          id="scoreJump"
+          class="player-action"
+          type="button"
+          aria-label="Jump to live score"
+        >
+          # Score
+        </button>
 
       </div>
 
@@ -452,6 +520,20 @@
 
     </div>
 
+
+    <div
+      id="scoreEmptyState"
+      class="score-empty-state"
+      aria-live="polite"
+    >
+      <span class="empty-score-icon">--</span>
+      <div>
+        <small>LIVE SCORE</small>
+        <strong>Score currently unavailable</strong>
+        <p>Waiting for live score data...</p>
+      </div>
+    </div>
+
   </section>
 
 
@@ -485,6 +567,31 @@
       </button>
 
     </div>
+
+
+      <div class="match-tools">
+
+        <label class="match-search">
+          <span aria-hidden="true">/</span>
+          <input
+            id="matchSearch"
+            type="search"
+            placeholder="Search matches"
+            aria-label="Search matches"
+          >
+        </label>
+
+        <div
+          class="match-filters"
+          role="group"
+          aria-label="Filter matches"
+        >
+          <button class="filter-button is-active" type="button" data-filter="all">All</button>
+          <button class="filter-button" type="button" data-filter="live">Live</button>
+          <button class="filter-button" type="button" data-filter="upcoming">Upcoming</button>
+        </div>
+
+      </div>
 
 
     <div
@@ -643,6 +750,43 @@
 </main>
 
 
+<aside
+  id="stickyScoreBar"
+  class="sticky-score-bar"
+  aria-live="polite"
+  aria-hidden="true"
+>
+  <div class="sticky-score-copy">
+    <span><i></i> LIVE</span>
+    <strong id="stickyMatchTitle">No match selected</strong>
+  </div>
+  <div class="sticky-score-value">
+    <strong id="stickyScoreValue">--</strong>
+    <span id="stickyOversValue"></span>
+  </div>
+  <button id="stickyScoreClose" type="button" aria-label="Hide sticky score bar">x</button>
+</aside>
+
+
+<div
+  id="actionToast"
+  class="action-toast"
+  role="status"
+  aria-live="polite"
+></div>
+
+
+<nav
+  class="mobile-bottom-nav"
+  aria-label="Mobile navigation"
+>
+  <a class="is-active" href="#top" data-mobile-nav="home"><span>^</span>Home</a>
+  <a href="#live" data-mobile-nav="live"><span>o</span>Live</a>
+  <a href="#matches" data-mobile-nav="matches"><span>+</span>Matches</a>
+  <a href="#liveScoreboard" data-mobile-nav="score"><span>#</span>Score</a>
+</nav>
+
+
 
 <!-- =====================================================
      FOOTER
@@ -686,6 +830,201 @@
 ===================================================== -->
 
 <script src="app.js"></script>
+
+
+<script>
+  (() => {
+    const body = document.body;
+    const liveSection = document.getElementById("live");
+    const player = document.getElementById("player");
+    const matchTitle = document.getElementById("matchTitle");
+    const statusText = document.getElementById("statusText");
+    const scoreMatchTitle = document.getElementById("scoreMatchTitle");
+    const teamScore = document.getElementById("teamScore");
+    const overs = document.getElementById("overs");
+    const scoreboard = document.getElementById("liveScoreboard");
+    const scoreEmptyState = document.getElementById("scoreEmptyState");
+    const matchesGrid = document.getElementById("matchesGrid");
+    const toast = document.getElementById("actionToast");
+    const stickyBar = document.getElementById("stickyScoreBar");
+    const connection = document.querySelector(".connection-status");
+    const connectionText = document.getElementById("connectionText");
+    const premiumLiveTitle = document.getElementById("premiumLiveTitle");
+    const premiumLiveState = document.getElementById("premiumLiveState");
+    const stickyMatchTitle = document.getElementById("stickyMatchTitle");
+    const stickyScoreValue = document.getElementById("stickyScoreValue");
+    const stickyOversValue = document.getElementById("stickyOversValue");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    let toastTimer;
+    let stickyDismissed = false;
+
+    const showToast = text => {
+      if (!toast) return;
+      toast.textContent = text;
+      toast.classList.add("is-visible");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 2200);
+    };
+
+    const normalizeStatus = value => String(value || "READY").toUpperCase();
+
+    const updateConnection = value => {
+      const status = normalizeStatus(value);
+      const label = {
+        LIVE: "Connected",
+        LOADING: "Connecting",
+        BUFFERING: "Connecting",
+        RECONNECTING: "Reconnecting",
+        OFFLINE: "Connection issue",
+        ERROR: "Connection issue"
+      }[status] || "Ready";
+
+      if (connection) {
+        connection.className = `connection-status status-${status.toLowerCase()}`;
+      }
+
+      if (connectionText) connectionText.textContent = label;
+      if (premiumLiveState) premiumLiveState.textContent = status;
+    };
+
+    const updateLiveCopy = () => {
+      const title = matchTitle?.textContent.trim() || "No match selected";
+      const scoreTitle = scoreMatchTitle?.textContent.trim();
+      const selectedTitle = title !== "No match selected" ? title : scoreTitle || title;
+      if (premiumLiveTitle) premiumLiveTitle.textContent = selectedTitle;
+      if (stickyMatchTitle) stickyMatchTitle.textContent = selectedTitle;
+
+      const score = teamScore?.textContent.trim();
+      const overValue = overs?.textContent.trim();
+      if (stickyScoreValue) stickyScoreValue.textContent = score && score !== "0/0" ? score : "--";
+      if (stickyOversValue) stickyOversValue.textContent = overValue && overValue !== "0.0 overs" ? overValue : "";
+
+      const scoreAvailable = scoreboard && getComputedStyle(scoreboard).display !== "none";
+      if (scoreEmptyState) scoreEmptyState.hidden = Boolean(scoreAvailable);
+    };
+
+    const updateSticky = () => {
+      if (!stickyBar || stickyDismissed) return;
+      const awayFromPlayer = window.scrollY > (liveSection?.offsetTop || 0) + 360;
+      const scoreVisible = scoreboard && getComputedStyle(scoreboard).display !== "none";
+      const shouldShow = awayFromPlayer && Boolean(scoreVisible || matchTitle?.textContent.trim() !== "No match selected");
+      stickyBar.classList.toggle("is-visible", shouldShow);
+      stickyBar.setAttribute("aria-hidden", String(!shouldShow));
+    };
+
+    const observeText = element => {
+      if (!element) return;
+      new MutationObserver(() => {
+        if (element === statusText) updateConnection(element.textContent);
+        updateLiveCopy();
+        updateSticky();
+      }).observe(element, { childList: true, characterData: true, subtree: true });
+    };
+
+    document.getElementById("theaterToggle")?.addEventListener("click", event => {
+      const enabled = body.classList.toggle("theater-mode");
+      event.currentTarget.setAttribute("aria-pressed", String(enabled));
+      showToast(enabled ? "Theater mode enabled" : "Theater mode disabled");
+    });
+
+    document.getElementById("focusToggle")?.addEventListener("click", event => {
+      const enabled = body.classList.toggle("focus-mode");
+      event.currentTarget.setAttribute("aria-pressed", String(enabled));
+      showToast(enabled ? "Focus mode enabled" : "Focus mode disabled");
+    });
+
+    document.getElementById("scoreJump")?.addEventListener("click", () => {
+      scoreboard?.scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "center" });
+    });
+
+    document.getElementById("stickyScoreClose")?.addEventListener("click", () => {
+      stickyDismissed = true;
+      stickyBar?.classList.remove("is-visible");
+      stickyBar?.setAttribute("aria-hidden", "true");
+    });
+
+    document.getElementById("matchSearch")?.addEventListener("input", event => {
+      const query = event.target.value.trim().toLowerCase();
+      document.querySelectorAll(".match-card").forEach(card => {
+        card.hidden = !card.textContent.toLowerCase().includes(query);
+      });
+    });
+
+    matchesGrid?.addEventListener("click", event => {
+      const watchButton = event.target.closest(".watch-button");
+      if (!watchButton) return;
+      document.querySelectorAll(".match-card").forEach(card => card.classList.remove("is-selected"));
+      watchButton.closest(".match-card")?.classList.add("is-selected");
+      showToast("Match selected");
+    });
+
+    document.querySelectorAll(".filter-button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".filter-button").forEach(item => item.classList.remove("is-active"));
+        button.classList.add("is-active");
+        const filter = button.dataset.filter;
+        document.querySelectorAll(".match-card").forEach(card => {
+          const isLive = card.textContent.toUpperCase().includes("LIVE");
+          card.hidden = filter === "live" ? !isLive : filter !== "all";
+        });
+      });
+    });
+
+    const enhanceMatchCards = () => {
+      document.querySelectorAll(".match-card").forEach(card => {
+        if (card.querySelector(".favorite-button")) return;
+        const title = Array.from(card.querySelectorAll(".team-name")).map(item => item.textContent.trim()).join(" vs ");
+        const key = `cricket-live-favorite:${title.toLowerCase()}`;
+        const favorite = document.createElement("button");
+        favorite.type = "button";
+        favorite.className = "favorite-button";
+        favorite.setAttribute("aria-label", `Favorite ${title}`);
+        favorite.setAttribute("aria-pressed", String(localStorage.getItem(key) === "true"));
+        favorite.textContent = "*";
+        if (localStorage.getItem(key) === "true") favorite.classList.add("is-favorite");
+        favorite.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          const active = favorite.classList.toggle("is-favorite");
+          favorite.setAttribute("aria-pressed", String(active));
+          localStorage.setItem(key, String(active));
+          showToast(active ? "Added to favorites" : "Removed from favorites");
+        });
+        card.appendChild(favorite);
+      });
+    };
+
+    matchesGrid && new MutationObserver(enhanceMatchCards).observe(matchesGrid, { childList: true });
+    enhanceMatchCards();
+    observeText(matchTitle);
+    observeText(statusText);
+    observeText(scoreMatchTitle);
+    observeText(teamScore);
+    observeText(overs);
+    updateConnection(statusText?.textContent);
+    updateLiveCopy();
+    updateSticky();
+
+    window.addEventListener("scroll", updateSticky, { passive: true });
+    window.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        body.classList.remove("theater-mode", "focus-mode");
+        document.getElementById("theaterToggle")?.setAttribute("aria-pressed", "false");
+        document.getElementById("focusToggle")?.setAttribute("aria-pressed", "false");
+      }
+    });
+
+    document.querySelectorAll("[data-mobile-nav]").forEach(link => {
+      link.addEventListener("click", () => {
+        document.querySelectorAll("[data-mobile-nav]").forEach(item => item.classList.remove("is-active"));
+        link.classList.add("is-active");
+      });
+    });
+
+    if (player) player.addEventListener("playing", () => updateConnection("LIVE"), { passive: true });
+  })();
+</script>
 
 
 </body>
