@@ -1811,3 +1811,195 @@ updateLiveScore();
 
 // Refresh every 60 seconds
 setInterval(updateLiveScore, 60 * 1000);
+
+/* ======================================================
+   LIVE STARTUP EXPERIENCE
+   UI-only adapter for the existing player flow.
+   ====================================================== */
+
+(() => {
+
+  const startupOverlay =
+    document.getElementById("overlay");
+
+  const startupOverlayTitle =
+    document.getElementById("overlayTitle");
+
+  const startupMessage =
+    document.getElementById("message");
+
+  const watchLiveButton =
+    document.getElementById("watchLiveButton");
+
+  const soundToggle =
+    document.getElementById("soundToggle");
+
+  const autoplayPreference =
+    document.getElementById("autoplayPreference");
+
+  const startupLiveMatches =
+    matches.filter(match =>
+      String(match.status).toUpperCase() === "LIVE" &&
+      Boolean(match.stream)
+    );
+
+  // Avoid choosing arbitrarily if the existing match list ever has multiple LIVE entries.
+  const startupMatch =
+    startupLiveMatches.length === 1
+      ? startupLiveMatches[0]
+      : null;
+
+  const autoplayStorageKey =
+    "cricket-live-autoplay";
+
+  const savedAutoplay =
+    localStorage.getItem(autoplayStorageKey);
+
+  const autoplayEnabled =
+    savedAutoplay !== "false";
+
+  if (autoplayPreference) {
+    autoplayPreference.checked =
+      autoplayEnabled;
+
+    autoplayPreference.addEventListener(
+      "change",
+      () => {
+        localStorage.setItem(
+          autoplayStorageKey,
+          String(autoplayPreference.checked)
+        );
+      }
+    );
+  }
+
+  function setSoundLabel() {
+
+    if (!soundToggle) {
+      return;
+    }
+
+    const muted =
+      Boolean(video.muted);
+
+    soundToggle.textContent =
+      muted
+        ? "🔇 Sound off"
+        : "🔊 Sound on";
+
+    soundToggle.setAttribute(
+      "aria-pressed",
+      String(!muted)
+    );
+
+    soundToggle.setAttribute(
+      "aria-label",
+      muted
+        ? "Unmute live stream"
+        : "Mute live stream"
+    );
+
+  }
+
+  function prepareLiveOverlay() {
+
+    if (!startupMatch) {
+
+      startupOverlay
+        ?.querySelector(".live-overlay-badge")
+        ?.setAttribute("hidden", "");
+
+      watchLiveButton?.setAttribute(
+        "hidden",
+        ""
+      );
+
+      soundToggle?.setAttribute(
+        "hidden",
+        ""
+      );
+
+      return;
+
+    }
+
+    startupOverlay?.classList.add(
+      "startup-overlay"
+    );
+
+    if (startupOverlayTitle) {
+      startupOverlayTitle.textContent =
+        "LIVE NOW";
+    }
+
+    if (startupMessage) {
+      startupMessage.textContent =
+        `${startupMatch.team1} vs ${startupMatch.team2} is streaming now.`;
+    }
+
+    watchLiveButton?.removeAttribute(
+      "hidden"
+    );
+
+    soundToggle?.removeAttribute(
+      "hidden"
+    );
+
+    setSoundLabel();
+
+  }
+
+  function startStartupMatch(muted) {
+
+    if (!startupMatch) {
+      return;
+    }
+
+    video.muted =
+      muted;
+
+    setSoundLabel();
+
+    playStream(
+      `${startupMatch.team1} vs ${startupMatch.team2}`,
+      startupMatch.stream
+    );
+
+  }
+
+  watchLiveButton?.addEventListener(
+    "click",
+    () => {
+      startStartupMatch(false);
+    }
+  );
+
+  soundToggle?.addEventListener(
+    "click",
+    () => {
+
+      if (!startupMatch) {
+        return;
+      }
+
+      video.muted =
+        !video.muted;
+
+      setSoundLabel();
+
+      if (!currentUrl) {
+        startStartupMatch(
+          video.muted
+        );
+      }
+
+    }
+  );
+
+  prepareLiveOverlay();
+
+  if (startupMatch && autoplayEnabled) {
+    startStartupMatch(true);
+  }
+
+})();

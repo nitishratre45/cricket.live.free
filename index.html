@@ -38,6 +38,11 @@
 
   <nav>
 
+        <div class="live-overlay-badge">
+          <i></i>
+          LIVE NOW
+        </div>
+
     <a href="#live">
       Live
     </a>
@@ -207,6 +212,26 @@
           Select a live match below.
         </p>
 
+        <div class="overlay-actions">
+          <button
+            id="watchLiveButton"
+            class="watch-live-button"
+            type="button"
+          >
+            ▶ WATCH LIVE
+          </button>
+
+          <button
+            id="soundToggle"
+            class="sound-toggle"
+            type="button"
+            aria-pressed="false"
+            aria-label="Unmute live stream"
+          >
+            🔇 Sound off
+          </button>
+        </div>
+
       </div>
 
     </div>
@@ -252,6 +277,11 @@
         >
           # Score
         </button>
+
+        <label class="autoplay-option">
+          <input id="autoplayPreference" type="checkbox" checked>
+          <span>Auto Play</span>
+        </label>
 
       </div>
 
