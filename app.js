@@ -1,4 +1,4 @@
-﻿// ======================================================
+// ======================================================
 // CRICKETLIVE
 // ======================================================
 
@@ -12,7 +12,7 @@
 //
 
 const TEST_STREAM =
-  "https://incentive-infrared-block-realized.trycloudflare.com/live/index.m3u8";
+  "https://optical-named-woods-contracts.trycloudflare.com/live/index.m3u8";
 
 
 // ======================================================
@@ -173,11 +173,11 @@ function playStream(
 
       lowLatencyMode: false,
 
-      maxBufferLength: 25,
-      maxMaxBufferLength: 40,
-      liveSyncDurationCount: 3,
-      liveMaxLatencyDurationCount: 6,
-      maxBufferHole: 0.5
+      maxBufferLength: 20,
+
+      maxMaxBufferLength: 30,
+
+      liveSyncDurationCount: 3
 
     });
 
@@ -194,11 +194,8 @@ function playStream(
         statusText.textContent =
           "LIVE";
 
-        video.play()
-          .then(() => {
-            hideOverlay();
-            statusText.textContent = "LIVE";
-          })
+        video
+          .play()
           .catch(() => {
 
             showOverlay(
@@ -212,51 +209,46 @@ function playStream(
     );
 
 
-    hls.on(Hls.Events.ERROR, (_, data) => {
+    hls.on(
+      Hls.Events.ERROR,
+      (_, data) => {
 
-      console.log("HLS error:", data);
-
-      if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-
-        console.log("Recovering media...");
-
-        hls.recoverMediaError();
-
-        return;
-      }
-
-      if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-
-        console.log("Recovering network...");
-
-        setTimeout(() => {
-          hls.startLoad();
-        }, 1000);
-
-        return;
-      }
-
-      if (data.fatal) {
-
-        statusText.textContent = "RECONNECTING";
-
-        showOverlay(
-          "Reconnecting...",
-          "Trying to restore the live stream."
+        console.log(
+          "HLS error:",
+          data
         );
 
-        setTimeout(() => {
 
-          if (hls) {
-            hls.destroy();
-            hls = null;
-          }
+        if (data.fatal) {
 
-          playStream(title, url);
+          statusText.textContent =
+            "ERROR";
 
-        }, 2000);
+          showOverlay(
+            "Stream unavailable",
+            "The stream cannot be played."
+          );
+
+        }
+
       }
-    });
+    );
+
+
+    video.addEventListener(
+      "playing",
+      () => {
+
+        hideOverlay();
+
+        statusText.textContent =
+          "LIVE";
+
+      },
+      {
+        once: true
+      }
+    );
 
   }
 
@@ -276,10 +268,6 @@ function playStream(
       () => {
 
         video.play()
-          .then(() => {
-            hideOverlay();
-            statusText.textContent = "LIVE";
-          })
           .catch(() => {
 
             showOverlay(
@@ -345,7 +333,7 @@ function createMatchCard(match) {
     <div class="match-top">
 
       <span class="live-label">
-        ðŸ”´ ${match.status}
+        🔴 ${match.status}
       </span>
 
       <span class="match-league">
@@ -382,7 +370,7 @@ function createMatchCard(match) {
 
 
     <button class="watch-button">
-      â–¶ Watch Live
+      ▶ Watch Live
     </button>
 
   `;
@@ -529,7 +517,7 @@ database
 
 
       viewerCountElement.textContent =
-        `ðŸ‘ ${count} Watching`;
+        `👁 ${count} Watching`;
 
     }
   );
@@ -540,9 +528,3 @@ database
 // ======================================================
 
 loadMatches();
-
-
-
-
-
-
