@@ -27,9 +27,9 @@ const matches = [
   {
     id: 1,
 
-    league: "Cricket Test",
+    league: "odi  series",
 
-    team1: "India",
+    team1: "zimbabwe",
 
     team2: "Australia",
 
@@ -39,9 +39,7 @@ const matches = [
 
     status: "LIVE",
 
-    stream: TEST_STREAM =
-    "https://incentive-infrared-block-realized.trycloudflare.com/live/index.m3u8";
-
+    stream: TEST_STREAM
 
   }
 
