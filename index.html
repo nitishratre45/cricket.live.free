@@ -1,15 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>CricketLive</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
 </head>
 
+
 <body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
 <header class="topbar">
 
@@ -17,23 +33,46 @@
     🏏 <span>CRICKET</span>LIVE
   </div>
 
+
   <nav>
-    <a href="#live">Live</a>
-    <a href="#matches">Matches</a>
-    <a href="#tournaments">Tournaments</a>
+
+    <a href="#live">
+      Live
+    </a>
+
+    <a href="#matches">
+      Matches
+    </a>
+
+    <a href="#tournaments">
+      Tournaments
+    </a>
+
   </nav>
 
+
   <div class="live-badge">
-    <i></i> LIVE
+
+    <i></i>
+
+    LIVE
+
   </div>
 
 </header>
 
 
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
 <main>
 
 
-  <!-- HERO -->
+  <!-- ===================================================
+       HERO
+  ==================================================== -->
 
   <section class="hero">
 
@@ -45,18 +84,26 @@
           🏏 CRICKET STREAMING
         </p>
 
+
         <h1>
           Watch Cricket<br>
           <span>Live & Free</span>
         </h1>
 
+
         <p class="hero-description">
-          Follow live cricket matches, schedules,
-          tournaments and authorized free streams
-          in one place.
+
+          Follow live cricket matches,
+          schedules, tournaments and
+          authorized free streams in one place.
+
         </p>
 
-        <a href="#live" class="hero-button">
+
+        <a
+          href="#live"
+          class="hero-button"
+        >
           🔴 Watch Live
         </a>
 
@@ -73,21 +120,29 @@
 
 
 
-  <!-- LIVE PLAYER -->
+  <!-- ===================================================
+       LIVE PLAYER
+  ==================================================== -->
 
-  <section id="live" class="section">
+  <section
+    id="live"
+    class="section"
+  >
 
     <div class="section-title">
 
       <div>
 
-        <small>LIVE NOW</small>
+        <small>
+          LIVE NOW
+        </small>
 
         <h2>
           Live Cricket
         </h2>
 
       </div>
+
 
       <div id="viewerCount">
         👁 0 Watching
@@ -96,27 +151,33 @@
     </div>
 
 
+
+    <!-- PLAYER -->
+
     <div class="player-box">
 
       <video
         id="player"
         controls
         playsinline
-        preload="auto">
-      </video>
+        preload="auto"
+      ></video>
 
 
       <div
         id="overlay"
-        class="player-overlay">
+        class="player-overlay"
+      >
 
         <div class="big-play">
           ▶
         </div>
 
+
         <h2 id="overlayTitle">
           Select a Match
         </h2>
+
 
         <p id="message">
           Select a live match below.
@@ -127,25 +188,264 @@
     </div>
 
 
+
+    <!-- =================================================
+         NOW PLAYING
+    ================================================== -->
+
+    
     <div class="now-playing">
+  <div>
+    <small>NOW PLAYING</small>
+    <h2 id="matchTitle">No match selected</h2>
+  </div>
 
-      <div>
+  <div id="quickScore" class="quick-score" style="display:none;">
+    <strong id="quickScoreText">—</strong>
+    <span id="quickOvers">—</span>
+  </div>
 
-        <small>
-          NOW PLAYING
-        </small>
+  <div class="player-status">
+    <i></i>
+    <span id="statusText">READY</span>
+  </div>
+</div>
 
-        <h2 id="matchTitle">
-          No match selected
-        </h2>
+
+
+    <!-- =================================================
+         LIVE SCOREBOARD
+    ================================================== -->
+
+    <div
+      id="liveScoreboard"
+      class="live-scoreboard"
+    >
+
+      <div class="scoreboard-header">
+
+        <div>
+
+          <small>
+            LIVE SCORE
+          </small>
+
+          <h2 id="scoreMatchTitle">
+            No live match
+          </h2>
+
+        </div>
+
+
+        <div class="score-live-badge">
+
+          <i></i>
+
+          LIVE
+
+        </div>
 
       </div>
 
-      <div class="player-status">
-        <i></i>
-        <span id="statusText">
-          READY
-        </span>
+
+
+      <!-- INNINGS -->
+
+      <div class="innings-score">
+
+        <div class="batting-team">
+
+          <div
+            class="team-logo"
+            id="battingTeamLogo"
+          >
+            🏏
+          </div>
+
+
+          <div>
+
+            <strong id="battingTeam">
+              —
+            </strong>
+
+            <span id="inningsText">
+              1st Innings
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="main-score">
+
+          <strong id="teamScore">
+            0/0
+          </strong>
+
+          <span id="overs">
+            0.0 overs
+          </span>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- CRICKET DETAILS -->
+
+      <div class="score-details">
+
+        <div class="score-detail">
+
+          <span>
+            CRR
+          </span>
+
+          <strong id="currentRunRate">
+            0.00
+          </strong>
+
+        </div>
+
+
+        <div class="score-detail">
+
+          <span>
+            TARGET
+          </span>
+
+          <strong id="targetScore">
+            —
+          </strong>
+
+        </div>
+
+
+        <div class="score-detail">
+
+          <span>
+            REQUIRED
+          </span>
+
+          <strong id="requiredRate">
+            —
+          </strong>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- BATTERS -->
+
+      <div class="players-score">
+
+        <div class="player-row">
+
+          <div>
+
+            <span class="player-name">
+              <span id="strikerName">
+                —
+              </span>
+              <b>★</b>
+            </span>
+
+            <small>
+              <span id="strikerRuns">
+                0
+              </span>
+              (
+              <span id="strikerBalls">
+                0
+              </span>
+              )
+
+            </small>
+
+          </div>
+
+
+          <strong id="strikerSR">
+            0.00
+          </strong>
+
+        </div>
+
+
+
+        <div class="player-row">
+
+          <div>
+
+            <span class="player-name">
+              <span id="nonStrikerName">
+                —
+              </span>
+            </span>
+
+            <small>
+
+              <span id="nonStrikerRuns">
+                0
+              </span>
+
+              (
+
+              <span id="nonStrikerBalls">
+                0
+              </span>
+
+              )
+
+            </small>
+
+          </div>
+
+
+          <strong id="nonStrikerSR">
+            0.00
+          </strong>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- BOWLER -->
+
+      <div class="bowler-row">
+
+        <div>
+
+          <span>
+            BOWLER
+          </span>
+
+          <strong id="bowlerName">
+            —
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            FIGURES
+          </span>
+
+          <strong id="bowlerFigures">
+            0/0
+          </strong>
+
+        </div>
+
       </div>
 
     </div>
@@ -154,17 +454,22 @@
 
 
 
-  <!-- LIVE MATCHES -->
+  <!-- ===================================================
+       LIVE MATCHES
+  ==================================================== -->
 
   <section
     id="matches"
-    class="section">
+    class="section"
+  >
 
     <div class="section-title">
 
       <div>
 
-        <small>CRICKET</small>
+        <small>
+          CRICKET
+        </small>
 
         <h2>
           Live Matches
@@ -172,8 +477,8 @@
 
       </div>
 
-      <button
-        id="refreshBtn">
+
+      <button id="refreshBtn">
         ↻ Refresh
       </button>
 
@@ -182,24 +487,29 @@
 
     <div
       id="matchesGrid"
-      class="matches-grid">
-    </div>
+      class="matches-grid"
+    ></div>
 
   </section>
 
 
 
-  <!-- TOURNAMENTS -->
+  <!-- ===================================================
+       TOURNAMENTS
+  ==================================================== -->
 
   <section
     id="tournaments"
-    class="section">
+    class="section"
+  >
 
     <div class="section-title">
 
       <div>
 
-        <small>EXPLORE</small>
+        <small>
+          EXPLORE
+        </small>
 
         <h2>
           Tournaments
@@ -210,27 +520,62 @@
     </div>
 
 
+
     <div class="tournament-grid">
 
+
       <div class="tournament-card">
-        <div>🏆</div>
-        <h3>International Cricket</h3>
-        <p>Test • ODI • T20I</p>
+
+        <div>
+          🏆
+        </div>
+
+        <h3>
+          International Cricket
+        </h3>
+
+        <p>
+          Test • ODI • T20I
+        </p>
+
       </div>
 
 
+
       <div class="tournament-card">
-        <div>🏏</div>
-        <h3>T20 Cricket</h3>
-        <p>Domestic & International</p>
+
+        <div>
+          🏏
+        </div>
+
+        <h3>
+          T20 Cricket
+        </h3>
+
+        <p>
+          Domestic & International
+        </p>
+
       </div>
 
 
+
       <div class="tournament-card">
-        <div>🌍</div>
-        <h3>World Cricket</h3>
-        <p>Matches from around the world</p>
+
+        <div>
+          🌍
+        </div>
+
+        <h3>
+          World Cricket
+        </h3>
+
+        <p>
+          Matches from around the world
+        </p>
+
       </div>
+
 
     </div>
 
@@ -238,25 +583,36 @@
 
 
 
-  <!-- INFO -->
+  <!-- ===================================================
+       INFO
+  ==================================================== -->
 
   <section class="info-section">
 
+
     <div class="info-card">
 
-      <span>STATUS</span>
+      <span>
+        STATUS
+      </span>
 
       <strong>
+
         <i></i>
+
         LIVE SYSTEM
+
       </strong>
 
     </div>
 
 
+
     <div class="info-card">
 
-      <span>PLAYER</span>
+      <span>
+        PLAYER
+      </span>
 
       <strong>
         HLS
@@ -265,9 +621,12 @@
     </div>
 
 
+
     <div class="info-card">
 
-      <span>QUALITY</span>
+      <span>
+        QUALITY
+      </span>
 
       <strong>
         AUTO
@@ -275,17 +634,26 @@
 
     </div>
 
+
   </section>
+
 
 </main>
 
 
 
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
 <footer>
 
   <div class="brand">
+
     🏏 CRICKET<span>LIVE</span>
+
   </div>
+
 
   <p>
     Cricket streaming portal
@@ -295,19 +663,29 @@
 
 
 
-<!-- HLS -->
+<!-- =====================================================
+     HLS
+===================================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.13"></script>
 
 
-<!-- FIREBASE -->
+<!-- =====================================================
+     FIREBASE
+===================================================== -->
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 
+<!-- =====================================================
+     APP
+===================================================== -->
+
 <script src="app.js"></script>
 
+
 </body>
+
 </html>

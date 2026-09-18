@@ -1,4 +1,4 @@
-// ======================================================
+﻿// ======================================================
 // CRICKETLIVE
 // STABLE HLS PLAYER
 // ======================================================
@@ -501,7 +501,7 @@ function playStream(
             console.log(error);
 
             reconnect(
-              "Media error — reconnecting..."
+              "Media error â€” reconnecting..."
             );
 
           }
@@ -791,7 +791,7 @@ function createMatchCard(match) {
     <div class="match-top">
 
       <span class="live-label">
-        🔴 ${match.status}
+        ðŸ”´ ${match.status}
       </span>
 
       <span class="match-league">
@@ -828,7 +828,7 @@ function createMatchCard(match) {
 
 
     <button class="watch-button">
-      ▶ Watch Live
+      â–¶ Watch Live
     </button>
 
   `;
@@ -901,6 +901,333 @@ refreshBtn.addEventListener(
   }
 );
 
+
+
+// ======================================================
+// LIVE CRICKET SCORE API
+// ======================================================
+
+async function updateLiveScore() {
+
+  const scoreboard = document.getElementById("liveScoreboard");
+  const quickScore = document.getElementById("quickScore");
+
+  try {
+
+    // Website par selected/live match
+    const siteMatch = matches.find(
+      match => match.status === "LIVE"
+    );
+
+    if (!siteMatch) {
+
+      if (scoreboard) scoreboard.style.display = "none";
+      if (quickScore) quickScore.style.display = "none";
+
+      return;
+    }
+
+    const response = await fetch(
+      "/api/live-score",
+      { cache: "no-store" }
+    );
+
+    if (!response.ok) {
+      throw new Error("Live score API failed");
+    }
+
+    const result = await response.json();
+
+    const apiMatches =
+      Array.isArray(result.data)
+        ? result.data
+        : [];
+
+    // ----------------------------------------------
+    // NORMALIZE TEAM NAMES
+    // ----------------------------------------------
+
+    function normalizeTeam(name) {
+
+      return String(name || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+
+    }
+
+    const team1 =
+      normalizeTeam(siteMatch.team1);
+
+    const team2 =
+      normalizeTeam(siteMatch.team2);
+
+    // ----------------------------------------------
+    // EXACT MATCH ONLY
+    // ----------------------------------------------
+
+    const liveMatch =
+      apiMatches.find(match => {
+
+        if (
+          match.matchStarted !== true ||
+          match.matchEnded === true
+        ) {
+          return false;
+        }
+
+        const teams =
+          Array.isArray(match.teams)
+            ? match.teams.map(normalizeTeam)
+            : [];
+
+        const matchName =
+          normalizeTeam(match.name);
+
+        const foundTeam1 =
+          teams.includes(team1) ||
+          matchName.includes(team1);
+
+        const foundTeam2 =
+          teams.includes(team2) ||
+          matchName.includes(team2);
+
+        return foundTeam1 && foundTeam2;
+
+      });
+
+    // ----------------------------------------------
+    // WEBSITE MATCH NOT LIVE IN API
+    // ----------------------------------------------
+
+    if (!liveMatch) {
+
+      if (scoreboard) {
+        scoreboard.style.display = "none";
+      }
+
+      if (quickScore) {
+        quickScore.style.display = "none";
+      }
+
+      console.log(
+        "Selected match is not currently live in API."
+      );
+
+      return;
+    }
+
+    // ----------------------------------------------
+    // SCORE AVAILABLE
+    // ----------------------------------------------
+
+    const scores =
+      Array.isArray(liveMatch.score)
+        ? liveMatch.score
+        : [];
+
+    if (!scores.length) {
+      return;
+    }
+
+    const current =
+      scores[scores.length - 1];
+
+    const runs =
+      Number(current.r || 0);
+
+    const wickets =
+      Number(current.w || 0);
+
+    const overs =
+      Number(current.o || 0);
+
+    const scoreText =
+      `${runs}/${wickets}`;
+
+    const oversText =
+      `${overs} overs`;
+
+    // ----------------------------------------------
+    // BATTING TEAM
+    // ----------------------------------------------
+
+    let battingTeam =
+      String(current.inning || "")
+        .replace(
+          /\s+Inning[s]?\s*\d*$/i,
+          ""
+        )
+        .trim();
+
+    if (!battingTeam) {
+
+      battingTeam =
+        Array.isArray(liveMatch.teams)
+          ? liveMatch.teams[0]
+          : siteMatch.team1;
+
+    }
+
+    // ----------------------------------------------
+    // HELPER
+    // ----------------------------------------------
+
+    function setScoreText(id, value) {
+
+      const element =
+        document.getElementById(id);
+
+      if (element) {
+        element.textContent = value;
+      }
+
+    }
+
+    // ----------------------------------------------
+    // FULL SCOREBOARD
+    // ----------------------------------------------
+
+    if (scoreboard) {
+      scoreboard.style.display = "";
+    }
+
+    setScoreText(
+      "scoreMatchTitle",
+      `${siteMatch.team1} vs ${siteMatch.team2}`
+    );
+
+    setScoreText(
+      "battingTeam",
+      battingTeam
+    );
+
+    setScoreText(
+      "teamScore",
+      scoreText
+    );
+
+    setScoreText(
+      "overs",
+      oversText
+    );
+
+    setScoreText(
+      "inningsText",
+      current.inning || "Live Innings"
+    );
+
+    // ----------------------------------------------
+    // CRR
+    // ----------------------------------------------
+
+    let crr = 0;
+
+    if (overs > 0) {
+      crr = runs / overs;
+    }
+
+    setScoreText(
+      "currentRunRate",
+      crr.toFixed(2)
+    );
+
+    // ----------------------------------------------
+    // TARGET
+    // ----------------------------------------------
+
+    let target = null;
+
+    if (scores.length >= 2) {
+
+      const previous =
+        scores[scores.length - 2];
+
+      target =
+        Number(previous.r || 0) + 1;
+
+    }
+
+    setScoreText(
+      "targetScore",
+      target ? String(target) : "—"
+    );
+
+    // ----------------------------------------------
+    // REQUIRED RATE
+    // ----------------------------------------------
+
+    let requiredRate = "—";
+
+    if (
+      target &&
+      target > runs &&
+      overs > 0
+    ) {
+
+      const remainingOvers =
+        20 - overs;
+
+      if (remainingOvers > 0) {
+
+        requiredRate =
+          (
+            (target - runs) /
+            remainingOvers
+          ).toFixed(2);
+
+      }
+
+    }
+
+    setScoreText(
+      "requiredRate",
+      requiredRate
+    );
+
+    // ----------------------------------------------
+    // QUICK SCORE BELOW VIDEO
+    // ----------------------------------------------
+
+    if (quickScore) {
+      quickScore.style.display = "";
+    }
+
+    setScoreText(
+      "quickScoreText",
+      scoreText
+    );
+
+    setScoreText(
+      "quickOvers",
+      oversText
+    );
+
+    console.log(
+      `LIVE SCORE: ${battingTeam} ${scoreText} (${oversText})`
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Live score error:",
+      error
+    );
+
+  }
+
+}
+
+
+// First check
+updateLiveScore();
+
+// Update every 60 seconds
+setInterval(
+  updateLiveScore,
+  60000
+);
 
 // ======================================================
 // FIREBASE
@@ -975,7 +1302,7 @@ database
 
 
       viewerCountElement.textContent =
-        `👁 ${count} Watching`;
+        `ðŸ‘ ${count} Watching`;
 
     }
   );
