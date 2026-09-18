@@ -194,8 +194,11 @@ function playStream(
         statusText.textContent =
           "LIVE";
 
-        video
-          .play()
+        video.play()
+          .then(() => {
+            hideOverlay();
+            statusText.textContent = "LIVE";
+          })
           .catch(() => {
 
             showOverlay(
@@ -273,6 +276,10 @@ function playStream(
       () => {
 
         video.play()
+          .then(() => {
+            hideOverlay();
+            statusText.textContent = "LIVE";
+          })
           .catch(() => {
 
             showOverlay(
@@ -533,6 +540,9 @@ database
 // ======================================================
 
 loadMatches();
+
+
+
 
 
 
