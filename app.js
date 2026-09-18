@@ -21,17 +21,17 @@ const matches = [
   {
     id: 1,
 
-    league: "odi series",
+    league: "one t20i",
 
-    team1: "zimbabwe",
+    team1: "india",
 
-    team2: "Australia",
+    team2: "japan",
 
     score1: "",
 
     score2: "",
 
-    status: "LIVE",
+    status: "upcoming",
 
     stream: TEST_STREAM
 
