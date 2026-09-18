@@ -1,5 +1,7 @@
-export default async function handler(req, res) {
+﻿export default async function handler(req, res) {
+
   try {
+
     const apiKey = process.env.CRICKET_API_KEY;
 
     if (!apiKey) {
@@ -11,23 +13,25 @@ export default async function handler(req, res) {
     const url =
       `https://api.cricapi.com/v1/currentMatches?apikey=${encodeURIComponent(apiKey)}&offset=0`;
 
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: "Cricket API request failed"
-      });
-    }
+    const response = await fetch(url, {
+      cache: "no-store"
+    });
 
     const data = await response.json();
 
-    return res.status(200).json(data);
+    console.log("CRICKETDATA RESPONSE:", JSON.stringify(data));
+
+    return res.status(response.status).json(data);
 
   } catch (error) {
-    console.error(error);
+
+    console.error("CRICKETDATA ERROR:", error);
 
     return res.status(500).json({
-      error: "Unable to fetch live cricket data"
+      error: "Unable to fetch CricketData",
+      message: error.message
     });
+
   }
+
 }
