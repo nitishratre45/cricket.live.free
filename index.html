@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>CricketLive</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <div class="brand">
+    🏏 <span>CRICKET</span>LIVE
+  </div>
+
+  <nav>
+    <a href="#live">Live</a>
+    <a href="#matches">Matches</a>
+    <a href="#tournaments">Tournaments</a>
+  </nav>
+
+  <div class="live-badge">
+    <i></i> LIVE
+  </div>
+
+</header>
+
+
+<main>
+
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <div class="hero-content">
+
+      <div class="hero-text">
+
+        <p class="tag">
+          🏏 CRICKET STREAMING
+        </p>
+
+        <h1>
+          Watch Cricket<br>
+          <span>Live & Free</span>
+        </h1>
+
+        <p class="hero-description">
+          Follow live cricket matches, schedules,
+          tournaments and authorized free streams
+          in one place.
+        </p>
+
+        <a href="#live" class="hero-button">
+          🔴 Watch Live
+        </a>
+
+      </div>
+
+
+      <div class="hero-ball">
+        🏏
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- LIVE PLAYER -->
+
+  <section id="live" class="section">
+
+    <div class="section-title">
+
+      <div>
+
+        <small>LIVE NOW</small>
+
+        <h2>
+          Live Cricket
+        </h2>
+
+      </div>
+
+      <div id="viewerCount">
+        👁 0 Watching
+      </div>
+
+    </div>
+
+
+    <div class="player-box">
+
+      <video
+        id="player"
+        controls
+        playsinline
+        preload="auto">
+      </video>
+
+
+      <div
+        id="overlay"
+        class="player-overlay">
+
+        <div class="big-play">
+          ▶
+        </div>
+
+        <h2 id="overlayTitle">
+          Select a Match
+        </h2>
+
+        <p id="message">
+          Select a live match below.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="now-playing">
+
+      <div>
+
+        <small>
+          NOW PLAYING
+        </small>
+
+        <h2 id="matchTitle">
+          No match selected
+        </h2>
+
+      </div>
+
+      <div class="player-status">
+        <i></i>
+        <span id="statusText">
+          READY
+        </span>
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- LIVE MATCHES -->
+
+  <section
+    id="matches"
+    class="section">
+
+    <div class="section-title">
+
+      <div>
+
+        <small>CRICKET</small>
+
+        <h2>
+          Live Matches
+        </h2>
+
+      </div>
+
+      <button
+        id="refreshBtn">
+        ↻ Refresh
+      </button>
+
+    </div>
+
+
+    <div
+      id="matchesGrid"
+      class="matches-grid">
+    </div>
+
+  </section>
+
+
+
+  <!-- TOURNAMENTS -->
+
+  <section
+    id="tournaments"
+    class="section">
+
+    <div class="section-title">
+
+      <div>
+
+        <small>EXPLORE</small>
+
+        <h2>
+          Tournaments
+        </h2>
+
+      </div>
+
+    </div>
+
+
+    <div class="tournament-grid">
+
+      <div class="tournament-card">
+        <div>🏆</div>
+        <h3>International Cricket</h3>
+        <p>Test • ODI • T20I</p>
+      </div>
+
+
+      <div class="tournament-card">
+        <div>🏏</div>
+        <h3>T20 Cricket</h3>
+        <p>Domestic & International</p>
+      </div>
+
+
+      <div class="tournament-card">
+        <div>🌍</div>
+        <h3>World Cricket</h3>
+        <p>Matches from around the world</p>
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- INFO -->
+
+  <section class="info-section">
+
+    <div class="info-card">
+
+      <span>STATUS</span>
+
+      <strong>
+        <i></i>
+        LIVE SYSTEM
+      </strong>
+
+    </div>
+
+
+    <div class="info-card">
+
+      <span>PLAYER</span>
+
+      <strong>
+        HLS
+      </strong>
+
+    </div>
+
+
+    <div class="info-card">
+
+      <span>QUALITY</span>
+
+      <strong>
+        AUTO
+      </strong>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+
+<footer>
+
+  <div class="brand">
+    🏏 CRICKET<span>LIVE</span>
+  </div>
+
+  <p>
+    Cricket streaming portal
+  </p>
+
+</footer>
+
+
+
+<!-- HLS -->
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.13"></script>
+
+
+<!-- FIREBASE -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>
