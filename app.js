@@ -1,4 +1,4 @@
-// ======================================================
+﻿// ======================================================
 // CRICKETLIVE
 // STABLE HLS PLAYER
 // ======================================================
@@ -501,7 +501,7 @@ function playStream(
             console.log(error);
 
             reconnect(
-              "Media error — reconnecting..."
+              "Media error â€” reconnecting..."
             );
 
           }
@@ -791,7 +791,7 @@ function createMatchCard(match) {
     <div class="match-top">
 
       <span class="live-label">
-        🔴 ${match.status}
+        ðŸ”´ ${match.status}
       </span>
 
       <span class="match-league">
@@ -828,7 +828,7 @@ function createMatchCard(match) {
 
 
     <button class="watch-button">
-      ▶ Watch Live
+      â–¶ Watch Live
     </button>
 
   `;
@@ -899,6 +899,247 @@ refreshBtn.addEventListener(
     loadMatches();
 
   }
+);
+
+
+ 
+// ======================================================
+// LIVE SCORE - CRICKETDATA
+// ======================================================
+
+async function updateLiveScore() {
+
+  const scoreboard = document.getElementById("liveScoreboard");
+  const quickScore = document.getElementById("quickScore");
+
+  try {
+
+    const siteMatch = matches.find(
+      m => m.status === "LIVE"
+    );
+
+    if (!siteMatch) {
+      if (scoreboard) scoreboard.style.display = "none";
+      if (quickScore) quickScore.style.display = "none";
+      return;
+    }
+
+    const response = await fetch("/api/live-score", {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Score API request failed");
+    }
+
+    const result = await response.json();
+
+    const apiMatches =
+      Array.isArray(result.data) ? result.data : [];
+
+    function normalize(value) {
+      return String(value || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    const team1 = normalize(siteMatch.team1);
+    const team2 = normalize(siteMatch.team2);
+
+    // EXACT TEAM MATCH
+    const liveMatch = apiMatches.find(match => {
+
+      const teams = Array.isArray(match.teams)
+        ? match.teams.map(normalize)
+        : [];
+
+      const name = normalize(match.name);
+
+      const hasTeam1 =
+        teams.includes(team1) ||
+        name.includes(team1);
+
+      const hasTeam2 =
+        teams.includes(team2) ||
+        name.includes(team2);
+
+      return hasTeam1 && hasTeam2;
+
+    });
+
+    if (!liveMatch) {
+
+      console.log(
+        "Zimbabwe vs Australia not found in current API data."
+      );
+
+      if (scoreboard) scoreboard.style.display = "none";
+      if (quickScore) quickScore.style.display = "none";
+
+      return;
+    }
+
+    const scores =
+      Array.isArray(liveMatch.score)
+        ? liveMatch.score
+        : [];
+
+    if (!scores.length) {
+      console.log("Match found but score is not available yet.");
+      return;
+    }
+
+    const current =
+      scores[scores.length - 1];
+
+    const runs = Number(current.r || 0);
+    const wickets = Number(current.w || 0);
+    const overs = Number(current.o || 0);
+
+    const score = `${runs}/${wickets}`;
+    const overText = `${overs} overs`;
+
+    let battingTeam =
+      String(current.inning || "")
+        .replace(/Inning\s*\d+/i, "")
+        .trim();
+
+    if (!battingTeam && Array.isArray(liveMatch.teams)) {
+      battingTeam = liveMatch.teams[0];
+    }
+
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
+    // SHOW SCOREBOARD
+    if (scoreboard) {
+      scoreboard.style.display = "block";
+    }
+
+    // MATCH
+    setText(
+      "scoreMatchTitle",
+      `${siteMatch.team1} vs ${siteMatch.team2}`
+    );
+
+    // BATTING TEAM
+    setText(
+      "battingTeam",
+      battingTeam || "—"
+    );
+
+    // SCORE
+    setText(
+      "teamScore",
+      score
+    );
+
+    setText(
+      "overs",
+      overText
+    );
+
+    setText(
+      "inningsText",
+      current.inning || "Live Innings"
+    );
+
+    // CRR
+    const crr =
+      overs > 0
+        ? (runs / overs).toFixed(2)
+        : "0.00";
+
+    setText(
+      "currentRunRate",
+      crr
+    );
+
+    // TARGET
+    let target = "—";
+
+    if (scores.length >= 2) {
+      const previous =
+        scores[scores.length - 2];
+
+      target =
+        String(Number(previous.r || 0) + 1);
+    }
+
+    setText(
+      "targetScore",
+      target
+    );
+
+    // REQUIRED RATE
+    let required = "—";
+
+    if (
+      target !== "—" &&
+      Number(target) > runs &&
+      overs < 20
+    ) {
+
+      const remaining =
+        20 - overs;
+
+      required =
+        ((Number(target) - runs) / remaining)
+          .toFixed(2);
+    }
+
+    setText(
+      "requiredRate",
+      required
+    );
+
+    // QUICK SCORE
+    if (quickScore) {
+      quickScore.style.display = "flex";
+    }
+
+    setText(
+      "quickScoreText",
+      score
+    );
+
+    setText(
+      "quickOvers",
+      overText
+    );
+
+    console.log(
+      "LIVE SCORE:",
+      siteMatch.team1,
+      "vs",
+      siteMatch.team2,
+      "|",
+      score,
+      "|",
+      overText
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Live score error:",
+      error
+    );
+
+  }
+}
+
+
+// FIRST UPDATE
+updateLiveScore();
+
+
+// UPDATE EVERY 60 SECONDS
+setInterval(
+  updateLiveScore,
+  60000
 );
 
 
@@ -975,7 +1216,7 @@ database
 
 
       viewerCountElement.textContent =
-        `👁 ${count} Watching`;
+        `ðŸ‘ ${count} Watching`;
 
     }
   );

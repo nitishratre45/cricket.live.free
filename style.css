@@ -1186,3 +1186,243 @@ footer p {
   }
 
 }
+/* ======================================================
+   LIVE SCOREBOARD
+   ====================================================== */
+
+.live-scoreboard {
+  display: none;
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, rgba(18,25,21,.98), rgba(7,11,9,.98));
+  box-shadow: 0 15px 40px rgba(0,0,0,.28);
+}
+
+.scoreboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.scoreboard-header small {
+  color: #4dff73;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.scoreboard-header h2 {
+  margin: 5px 0 0;
+  font-size: 20px;
+}
+
+.score-live-badge {
+  color: #ff4d67;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.score-live-badge i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #ff3150;
+  box-shadow: 0 0 10px rgba(255,49,80,.7);
+}
+
+.innings-score {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 0;
+}
+
+.batting-team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.team-logo {
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(77,255,115,.08);
+  font-size: 22px;
+}
+
+.batting-team strong {
+  display: block;
+  font-size: 17px;
+}
+
+.batting-team span {
+  display: block;
+  margin-top: 4px;
+  color: #858d88;
+  font-size: 12px;
+}
+
+.main-score {
+  text-align: right;
+}
+
+.main-score strong {
+  display: block;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.main-score span {
+  display: block;
+  margin-top: 7px;
+  color: #8b938e;
+  font-size: 12px;
+}
+
+.score-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.score-detail {
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.035);
+  text-align: center;
+}
+
+.score-detail span {
+  display: block;
+  color: #777f7a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.score-detail strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 17px;
+}
+
+.players-score {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.player-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 4px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.player-name {
+  font-weight: 700;
+}
+
+.player-name b {
+  color: #4dff73;
+  margin-left: 5px;
+}
+
+.player-row small {
+  display: block;
+  margin-top: 4px;
+  color: #8b938e;
+}
+
+.player-row > strong {
+  font-size: 13px;
+}
+
+.bowler-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 12px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.bowler-row span {
+  display: block;
+  color: #777f7a;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.bowler-row strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.quick-score {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  margin-right: 20px;
+}
+
+.quick-score strong {
+  font-size: 18px;
+}
+
+.quick-score span {
+  color: #8b938e;
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+
+  .live-scoreboard {
+    padding: 16px;
+    border-radius: 15px;
+  }
+
+  .scoreboard-header h2 {
+    font-size: 16px;
+  }
+
+  .innings-score {
+    align-items: flex-start;
+  }
+
+  .main-score strong {
+    font-size: 28px;
+  }
+
+  .score-details {
+    gap: 6px;
+  }
+
+  .score-detail {
+    padding: 11px 6px;
+  }
+
+  .quick-score {
+    margin-right: 10px;
+  }
+
+  .quick-score strong {
+    font-size: 15px;
+  }
+
+}
+
