@@ -9,6 +9,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -2117,6 +2121,8 @@ footer p {
 
   .autoplay-option {
     margin-left: 0;
+    grid-column: 1 / -1;
+    justify-self: end;
   }
 }
 
@@ -2144,30 +2150,6 @@ footer p {
   50% {
     opacity: 1;
     transform: scale(1.08);
-  }
-}
-
-@keyframes stickyIn {
-  from {
-    opacity: 0;
-    transform: translate3d(-50%, 12px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
-@keyframes toastIn {
-  from {
-    opacity: 0;
-    transform: translate3d(-50%, 10px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(-50%, 0, 0);
   }
 }
 
@@ -2320,6 +2302,7 @@ footer p {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .player-action:hover,
@@ -2581,13 +2564,24 @@ footer p {
   font-size: 10px;
 }
 
-#stickyScoreClose {
+#stickyScoreClose,
+.sticky-action {
   display: grid;
-  width: 25px;
+  min-width: 25px;
   height: 25px;
   place-items: center;
   border-radius: 50%;
   font-size: 12px;
+}
+
+.sticky-action {
+  width: auto;
+  padding: 0 9px;
+  border-radius: 7px;
+  color: var(--green);
+  font-size: 9px;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .action-toast {
@@ -2686,12 +2680,14 @@ body.focus-mode #live .live-scoreboard {
   }
 
   .player-actions {
+    display: grid;
     width: 100%;
-    justify-content: space-between;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
   }
 
   .player-action {
-    flex: 1;
+    width: 100%;
     padding-right: 6px;
     padding-left: 6px;
   }

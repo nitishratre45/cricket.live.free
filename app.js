@@ -827,7 +827,7 @@ function createMatchCard(match) {
     </div>
 
 
-    <button class="watch-button">
+    <button class="watch-button" type="button" aria-label="Watch ${match.team1} versus ${match.team2} live">
       â–¶ Watch Live
     </button>
 
@@ -907,7 +907,7 @@ refreshBtn.addEventListener(
 // LIVE SCORE - CRICKETDATA
 // ======================================================
 
-async function updateLiveScore() {
+async function legacyScoreUpdate() {
 
   const scoreboard = document.getElementById("liveScoreboard");
   const quickScore = document.getElementById("quickScore");
@@ -1132,17 +1132,6 @@ async function updateLiveScore() {
 }
 
 
-// FIRST UPDATE
-updateLiveScore();
-
-
-// UPDATE EVERY 60 SECONDS
-setInterval(
-  updateLiveScore,
-  60000
-);
-
-
 // ======================================================
 // FIREBASE
 // ======================================================
@@ -1232,7 +1221,7 @@ loadMatches();
    CRICKETDATA LIVE SCORE
    ====================================================== */
 
-async function updateLiveScore() {
+async function legacyDetailedScoreUpdate() {
 
   const scoreboard = document.getElementById("liveScoreboard");
   const quickScore = document.getElementById("quickScore");
@@ -1535,13 +1524,6 @@ async function updateLiveScore() {
   }
 
 }
-
-updateLiveScore();
-
-setInterval(
-  updateLiveScore,
-  60000
-);
 
 // ==========================================
 // LIVE SCOREBOARD - CRICKETDATA CRICSCORE
@@ -1852,8 +1834,14 @@ setInterval(updateLiveScore, 60 * 1000);
   const autoplayStorageKey =
     "cricket-live-autoplay";
 
-  const savedAutoplay =
-    localStorage.getItem(autoplayStorageKey);
+  let savedAutoplay = null;
+
+  try {
+    savedAutoplay =
+      localStorage.getItem(autoplayStorageKey);
+  } catch (error) {
+    console.warn("Autoplay preference is unavailable.", error);
+  }
 
   const autoplayEnabled =
     savedAutoplay !== "false";
@@ -1865,10 +1853,14 @@ setInterval(updateLiveScore, 60 * 1000);
     autoplayPreference.addEventListener(
       "change",
       () => {
-        localStorage.setItem(
-          autoplayStorageKey,
-          String(autoplayPreference.checked)
-        );
+        try {
+          localStorage.setItem(
+            autoplayStorageKey,
+            String(autoplayPreference.checked)
+          );
+        } catch (error) {
+          console.warn("Autoplay preference could not be saved.", error);
+        }
       }
     );
   }

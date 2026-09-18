@@ -17,8 +17,8 @@
     href="style.css"
   >
 
-    
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3">
+  <link rel="apple-touch-icon" href="/favicon.svg?v=3">
 </head>
 
 
@@ -37,11 +37,6 @@
 
 
   <nav>
-
-        <div class="live-overlay-badge">
-          <i></i>
-          LIVE NOW
-        </div>
 
     <a href="#live">
       Live
@@ -198,6 +193,11 @@
         class="player-overlay"
       >
 
+        <div class="live-overlay-badge">
+          <i></i>
+          LIVE NOW
+        </div>
+
         <div class="big-play">
           ▶
         </div>
@@ -221,15 +221,6 @@
             ▶ WATCH LIVE
           </button>
 
-          <button
-            id="soundToggle"
-            class="sound-toggle"
-            type="button"
-            aria-pressed="false"
-            aria-label="Unmute live stream"
-          >
-            🔇 Sound off
-          </button>
         </div>
 
       </div>
@@ -276,6 +267,25 @@
           aria-label="Jump to live score"
         >
           # Score
+        </button>
+
+        <button
+          id="soundToggle"
+          class="player-action sound-toggle"
+          type="button"
+          aria-pressed="false"
+          aria-label="Unmute live stream"
+        >
+          🔇 Sound off
+        </button>
+
+        <button
+          id="copyLiveLink"
+          class="player-action"
+          type="button"
+          aria-label="Copy live page link"
+        >
+          Link
         </button>
 
         <label class="autoplay-option">
@@ -592,7 +602,7 @@
       </div>
 
 
-      <button id="refreshBtn">
+      <button id="refreshBtn" type="button" aria-label="Refresh live matches">
         ↻ Refresh
       </button>
 
@@ -794,6 +804,7 @@
     <strong id="stickyScoreValue">--</strong>
     <span id="stickyOversValue"></span>
   </div>
+  <button id="backToLive" class="sticky-action" type="button">Back to live</button>
   <button id="stickyScoreClose" type="button" aria-label="Hide sticky score bar">x</button>
 </aside>
 
@@ -952,6 +963,13 @@
       }).observe(element, { childList: true, characterData: true, subtree: true });
     };
 
+    if (scoreboard) {
+      new MutationObserver(() => {
+        updateLiveCopy();
+        updateSticky();
+      }).observe(scoreboard, { attributes: true, attributeFilter: ["style", "class"] });
+    }
+
     document.getElementById("theaterToggle")?.addEventListener("click", event => {
       const enabled = body.classList.toggle("theater-mode");
       event.currentTarget.setAttribute("aria-pressed", String(enabled));
@@ -966,6 +984,34 @@
 
     document.getElementById("scoreJump")?.addEventListener("click", () => {
       scoreboard?.scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "center" });
+    });
+
+    document.getElementById("backToLive")?.addEventListener("click", () => {
+      liveSection?.scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "start" });
+    });
+
+    document.getElementById("copyLiveLink")?.addEventListener("click", async () => {
+      const link = `${window.location.href.split("#")[0]}#live`;
+
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(link);
+        } else {
+          const input = document.createElement("textarea");
+          input.value = link;
+          input.setAttribute("readonly", "");
+          input.style.position = "fixed";
+          input.style.opacity = "0";
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand("copy");
+          input.remove();
+        }
+
+        showToast("Live link copied");
+      } catch (error) {
+        showToast("Copy is unavailable in this browser");
+      }
     });
 
     document.getElementById("stickyScoreClose")?.addEventListener("click", () => {
