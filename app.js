@@ -1543,3 +1543,271 @@ setInterval(
   60000
 );
 
+// ==========================================
+// LIVE SCOREBOARD - CRICKETDATA CRICSCORE
+// ==========================================
+
+const TARGET_TEAM_1 = "zimbabwe";
+const TARGET_TEAM_2 = "australia";
+
+function normalizeTeamName(name) {
+  return String(name || "")
+    .replace(/\[.*?\]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function isTargetMatch(match) {
+  const team1 = normalizeTeamName(match.t1);
+  const team2 = normalizeTeamName(match.t2);
+
+  return (
+    (team1.includes(TARGET_TEAM_1) && team2.includes(TARGET_TEAM_2)) ||
+    (team1.includes(TARGET_TEAM_2) && team2.includes(TARGET_TEAM_1))
+  );
+}
+
+function parseScore(scoreText) {
+  if (!scoreText) {
+    return { runs: "?", wickets: "?", overs: "?" };
+  }
+
+  const match = String(scoreText).match(
+    /(\d+)\s*\/\s*(\d+)\s*\(([\d.]+)\)/
+  );
+
+  if (!match) {
+    return { runs: "?", wickets: "?", overs: "?" };
+  }
+
+  return {
+    runs: match[1],
+    wickets: match[2],
+    overs: match[3]
+  };
+}
+
+function hideLiveScoreboard() {
+  const scoreboard = document.getElementById("liveScoreboard");
+  const quickScore = document.getElementById("quickScore");
+
+  if (scoreboard) scoreboard.style.display = "none";
+  if (quickScore) quickScore.style.display = "none";
+}
+
+function showLiveScoreboard(match) {
+  const scoreboard = document.getElementById("liveScoreboard");
+  const quickScore = document.getElementById("quickScore");
+
+  if (!scoreboard) return;
+
+  scoreboard.style.display = "block";
+
+  if (quickScore) {
+    quickScore.style.display = "flex";
+  }
+
+  const team1Name = normalizeTeamName(match.t1)
+    .replace(/\b\w/g, c => c.toUpperCase());
+
+  const team2Name = normalizeTeamName(match.t2)
+    .replace(/\b\w/g, c => c.toUpperCase());
+
+  const team1Score = parseScore(match.t1s);
+  const team2Score = parseScore(match.t2s);
+
+  const title = document.getElementById("scoreMatchTitle");
+
+  if (title) {
+    title.textContent = `${team1Name} vs ${team2Name}`;
+  }
+
+  // Current innings = score available for the batting side.
+  // Prefer the side whose score has not reached 10 wickets.
+  let battingTeam = team1Name;
+  let battingScore = team1Score;
+
+  if (
+    team1Score.wickets === "10" &&
+    team2Score.wickets !== "10"
+  ) {
+    battingTeam = team2Name;
+    battingScore = team2Score;
+  } else if (
+    team2Score.wickets === "10" &&
+    team1Score.wickets !== "10"
+  ) {
+    battingTeam = team1Name;
+    battingScore = team1Score;
+  } else if (match.t2s) {
+    battingTeam = team2Name;
+    battingScore = team2Score;
+  }
+
+  const battingTeamElement =
+    document.getElementById("battingTeam");
+
+  const teamScoreElement =
+    document.getElementById("teamScore");
+
+  const oversElement =
+    document.getElementById("overs");
+
+  const inningsElement =
+    document.getElementById("inningsText");
+
+  const crrElement =
+    document.getElementById("currentRunRate");
+
+  const targetElement =
+    document.getElementById("targetScore");
+
+  const requiredRateElement =
+    document.getElementById("requiredRate");
+
+  if (battingTeamElement) {
+    battingTeamElement.textContent = battingTeam;
+  }
+
+  if (teamScoreElement) {
+    teamScoreElement.textContent =
+      `${battingScore.runs}/${battingScore.wickets}`;
+  }
+
+  if (oversElement) {
+    oversElement.textContent =
+      `(${battingScore.overs} ov)`;
+  }
+
+  if (inningsElement) {
+    inningsElement.textContent = "LIVE";
+  }
+
+  const oversNumber = parseFloat(battingScore.overs);
+  const runsNumber = parseInt(battingScore.runs, 10);
+
+  let crr = "?";
+
+  if (
+    Number.isFinite(oversNumber) &&
+    oversNumber > 0 &&
+    Number.isFinite(runsNumber)
+  ) {
+    crr = (runsNumber / oversNumber).toFixed(2);
+  }
+
+  if (crrElement) {
+    crrElement.textContent = crr;
+  }
+
+  if (targetElement) {
+    targetElement.textContent = "?";
+  }
+
+  if (requiredRateElement) {
+    requiredRateElement.textContent = "?";
+  }
+
+  // Current cricScore response does not provide batter/bowler figures.
+  [
+    "strikerName",
+    "strikerRuns",
+    "strikerBalls",
+    "strikerSR",
+    "nonStrikerName",
+    "nonStrikerRuns",
+    "nonStrikerBalls",
+    "nonStrikerSR",
+    "bowlerName",
+    "bowlerFigures"
+  ].forEach(id => {
+    const element = document.getElementById(id);
+
+    if (element) {
+      element.textContent = "?";
+    }
+  });
+
+  const quickScoreText =
+    document.getElementById("quickScoreText");
+
+  const quickOvers =
+    document.getElementById("quickOvers");
+
+  if (quickScoreText) {
+    quickScoreText.textContent =
+      `${battingTeam} ${battingScore.runs}/${battingScore.wickets}`;
+  }
+
+  if (quickOvers) {
+    quickOvers.textContent =
+      `(${battingScore.overs} ov)`;
+  }
+}
+
+async function updateLiveScore() {
+  try {
+    const response = await fetch("/api/live-score", {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error(`API HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    console.log("CricketData cricScore response:", result);
+
+    const matches =
+      Array.isArray(result)
+        ? result
+        : Array.isArray(result.data)
+          ? result.data
+          : [];
+
+    console.log("CricketData matches:", matches);
+
+    // EXACT MATCH ONLY
+    const targetMatch = matches.find(isTargetMatch);
+
+    if (!targetMatch) {
+      console.log(
+        "Target match not found:",
+        TARGET_TEAM_1,
+        "vs",
+        TARGET_TEAM_2
+      );
+
+      hideLiveScoreboard();
+      return;
+    }
+
+    // Never show a finished/result/fixture match.
+    if (
+      String(targetMatch.ms || "").toLowerCase() !== "live"
+    ) {
+      console.log(
+        "Target match exists but is not LIVE:",
+        targetMatch
+      );
+
+      hideLiveScoreboard();
+      return;
+    }
+
+    console.log("TARGET LIVE MATCH FOUND:", targetMatch);
+
+    showLiveScoreboard(targetMatch);
+
+  } catch (error) {
+    console.error("Live scoreboard error:", error);
+    hideLiveScoreboard();
+  }
+}
+
+// First score load
+updateLiveScore();
+
+// Refresh every 60 seconds
+setInterval(updateLiveScore, 60 * 1000);
