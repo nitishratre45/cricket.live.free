@@ -1,6 +1,21 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="22" fill="#050505"/>
-  <circle cx="50" cy="50" r="32" fill="#22c55e"/>
-  <path d="M35 62 L65 38" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
-  <circle cx="65" cy="38" r="7" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="28" fill="#050805"/>
+  
+  <!-- Cricket ball -->
+  <circle cx="64" cy="64" r="43" fill="#d71920"/>
+  
+  <!-- Ball seam -->
+  <path d="M38 36 C58 48 70 80 90 92"
+        fill="none"
+        stroke="#ffffff"
+        stroke-width="5"
+        stroke-linecap="round"/>
+        
+  <path d="M43 42 l-6 7 M50 48 l-6 7 M57 57 l-6 7 M65 67 l-6 7 M73 77 l-6 7 M82 87 l-6 7"
+        stroke="#ffffff"
+        stroke-width="3"
+        stroke-linecap="round"/>
+        
+  <!-- LIVE dot -->
+  <circle cx="102" cy="25" r="9" fill="#22c55e"/>
 </svg>
