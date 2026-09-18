@@ -1,15 +1,12 @@
 // ======================================================
 // CRICKETLIVE
+// STABLE HLS PLAYER
 // ======================================================
 
 
 // ======================================================
 // YOUR AUTHORIZED HLS STREAM
 // ======================================================
-//
-// Testing ke liye Mux stream.
-// Baad me yaha apni authorized HLS URL daal sakte ho.
-//
 
 const TEST_STREAM =
   "https://optical-named-woods-contracts.trycloudflare.com/live/index.m3u8";
@@ -18,16 +15,13 @@ const TEST_STREAM =
 // ======================================================
 // MATCH DATA
 // ======================================================
-//
-// Yaha apne authorized/free streams add kar sakte ho.
-//
 
 const matches = [
 
   {
     id: 1,
 
-    league: "odi  series",
+    league: "odi series",
 
     team1: "zimbabwe",
 
@@ -76,17 +70,38 @@ const refreshBtn =
 
 
 // ======================================================
-// HLS
+// HLS VARIABLES
 // ======================================================
 
 let hls = null;
 
+let currentTitle = "";
+
+let currentUrl = "";
+
+let reconnectTimer = null;
+
+let stallTimer = null;
+
+let reconnectAttempts = 0;
+
+let isStarting = false;
+
 
 // ======================================================
-// PLAYER
+// PLAYER CLEANUP
 // ======================================================
 
 function destroyPlayer() {
+
+  clearTimeout(reconnectTimer);
+
+  clearTimeout(stallTimer);
+
+  reconnectTimer = null;
+
+  stallTimer = null;
+
 
   if (hls) {
 
@@ -96,7 +111,17 @@ function destroyPlayer() {
 
   }
 
-  video.pause();
+
+  try {
+
+    video.pause();
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
 
   video.removeAttribute("src");
 
@@ -104,6 +129,22 @@ function destroyPlayer() {
 
 }
 
+
+// ======================================================
+// STATUS
+// ======================================================
+
+function setStatus(status) {
+
+  statusText.textContent =
+    status;
+
+}
+
+
+// ======================================================
+// OVERLAY
+// ======================================================
 
 function showOverlay(title, text) {
 
@@ -113,25 +154,121 @@ function showOverlay(title, text) {
   message.textContent =
     text;
 
-  overlay.classList.remove(
-    "hidden"
-  );
+  overlay.classList.remove("hidden");
 
 }
 
 
 function hideOverlay() {
 
-  overlay.classList.add(
-    "hidden"
-  );
+  overlay.classList.add("hidden");
 
 }
 
 
+// ======================================================
+// SAFE PLAY
+// ======================================================
+
+function safePlay() {
+
+  if (!video) {
+    return;
+  }
+
+
+  const promise =
+    video.play();
+
+
+  if (promise !== undefined) {
+
+    promise
+      .then(() => {
+
+        hideOverlay();
+
+        setStatus("LIVE");
+
+        reconnectAttempts = 0;
+
+      })
+      .catch(() => {
+
+        showOverlay(
+          currentTitle,
+          "Press play to start."
+        );
+
+        setStatus("READY");
+
+      });
+
+  }
+
+}
+
+
+// ======================================================
+// RECONNECT
+// ======================================================
+
+function reconnect(reason = "Connection interrupted") {
+
+  if (!currentUrl) {
+    return;
+  }
+
+
+  if (isStarting) {
+    return;
+  }
+
+
+  clearTimeout(reconnectTimer);
+
+
+  reconnectAttempts++;
+
+
+  setStatus("RECONNECTING");
+
+
+  showOverlay(
+    "Reconnecting...",
+    reason
+  );
+
+
+  const delay =
+    Math.min(
+      1000 * reconnectAttempts,
+      5000
+    );
+
+
+  reconnectTimer =
+    setTimeout(() => {
+
+      playStream(
+        currentTitle,
+        currentUrl,
+        true
+      );
+
+    }, delay);
+
+}
+
+
+// ======================================================
+// HLS PLAYER
+// ======================================================
+
 function playStream(
   title,
-  url
+  url,
+  isReconnect = false
 ) {
 
   if (!url) {
@@ -141,7 +278,31 @@ function playStream(
       "No authorized stream is available."
     );
 
+    setStatus("OFFLINE");
+
     return;
+
+  }
+
+
+  if (isStarting) {
+    return;
+  }
+
+
+  isStarting = true;
+
+
+  currentTitle =
+    title;
+
+  currentUrl =
+    url;
+
+
+  if (!isReconnect) {
+
+    reconnectAttempts = 0;
 
   }
 
@@ -152,8 +313,7 @@ function playStream(
   matchTitle.textContent =
     title;
 
-  statusText.textContent =
-    "LOADING";
+  setStatus("LOADING");
 
 
   showOverlay(
@@ -162,24 +322,53 @@ function playStream(
   );
 
 
+  // ====================================================
+  // HLS.JS
+  // ====================================================
+
   if (
     window.Hls &&
     Hls.isSupported()
   ) {
 
-    hls = new Hls({
+    hls =
+      new Hls({
 
-      enableWorker: true,
+        enableWorker: true,
 
-      lowLatencyMode: false,
+        lowLatencyMode: false,
 
-      maxBufferLength: 20,
+        backBufferLength: 30,
 
-      maxMaxBufferLength: 30,
+        maxBufferLength: 30,
 
-      liveSyncDurationCount: 3
+        maxMaxBufferLength: 60,
 
-    });
+        liveSyncDurationCount: 3,
+
+        liveMaxLatencyDurationCount: 8,
+
+        maxBufferHole: 1,
+
+        highBufferWatchdogPeriod: 2,
+
+        nudgeOffset: 0.2,
+
+        nudgeMaxRetry: 5,
+
+        fragLoadingMaxRetry: 6,
+
+        manifestLoadingMaxRetry: 6,
+
+        levelLoadingMaxRetry: 6,
+
+        fragLoadingRetryDelay: 1000,
+
+        manifestLoadingRetryDelay: 1000,
+
+        levelLoadingRetryDelay: 1000
+
+      });
 
 
     hls.loadSource(url);
@@ -187,27 +376,67 @@ function playStream(
     hls.attachMedia(video);
 
 
+    // ==================================================
+    // MANIFEST
+    // ==================================================
+
     hls.on(
       Hls.Events.MANIFEST_PARSED,
       () => {
 
-        statusText.textContent =
-          "LIVE";
+        isStarting = false;
 
-        video
-          .play()
-          .catch(() => {
+        setStatus("LIVE");
 
-            showOverlay(
-              title,
-              "Press play to start."
-            );
-
-          });
+        safePlay();
 
       }
     );
 
+
+    // ==================================================
+    // FRAGMENT LOADED
+    // ==================================================
+
+    hls.on(
+      Hls.Events.FRAG_LOADED,
+      () => {
+
+        reconnectAttempts = 0;
+
+        if (!video.paused) {
+
+          setStatus("LIVE");
+
+        }
+
+      }
+    );
+
+
+    // ==================================================
+    // BUFFER APPENDED
+    // ==================================================
+
+    hls.on(
+      Hls.Events.BUFFER_APPENDED,
+      () => {
+
+        if (!video.paused) {
+
+          clearTimeout(stallTimer);
+
+          setStatus("LIVE");
+
+        }
+
+      }
+    );
+
+
+    // ==================================================
+    // HLS ERROR
+    // ==================================================
 
     hls.on(
       Hls.Events.ERROR,
@@ -219,14 +448,86 @@ function playStream(
         );
 
 
+        // ----------------------------------------------
+        // NETWORK ERROR
+        // ----------------------------------------------
+
+        if (
+          data.type ===
+          Hls.ErrorTypes.NETWORK_ERROR
+        ) {
+
+          setStatus(
+            "RECONNECTING"
+          );
+
+
+          try {
+
+            hls.startLoad();
+
+          } catch (error) {
+
+            console.log(error);
+
+          }
+
+
+          return;
+
+        }
+
+
+        // ----------------------------------------------
+        // MEDIA ERROR
+        // ----------------------------------------------
+
+        if (
+          data.type ===
+          Hls.ErrorTypes.MEDIA_ERROR
+        ) {
+
+          console.log(
+            "Recovering media..."
+          );
+
+
+          try {
+
+            hls.recoverMediaError();
+
+          } catch (error) {
+
+            console.log(error);
+
+            reconnect(
+              "Media error — reconnecting..."
+            );
+
+          }
+
+
+          return;
+
+        }
+
+
+        // ----------------------------------------------
+        // FATAL ERROR
+        // ----------------------------------------------
+
         if (data.fatal) {
 
-          statusText.textContent =
-            "ERROR";
+          console.log(
+            "Fatal HLS error"
+          );
 
-          showOverlay(
-            "Stream unavailable",
-            "The stream cannot be played."
+
+          isStarting = false;
+
+
+          reconnect(
+            "Stream connection lost."
           );
 
         }
@@ -234,30 +535,21 @@ function playStream(
       }
     );
 
-
-    video.addEventListener(
-      "playing",
-      () => {
-
-        hideOverlay();
-
-        statusText.textContent =
-          "LIVE";
-
-      },
-      {
-        once: true
-      }
-    );
-
   }
 
+
+  // ====================================================
+  // NATIVE HLS
+  // ====================================================
 
   else if (
     video.canPlayType(
       "application/vnd.apple.mpegurl"
     )
   ) {
+
+    isStarting = false;
+
 
     video.src =
       url;
@@ -267,15 +559,9 @@ function playStream(
       "loadedmetadata",
       () => {
 
-        video.play()
-          .catch(() => {
+        setStatus("LIVE");
 
-            showOverlay(
-              title,
-              "Press play to start."
-            );
-
-          });
+        safePlay();
 
       },
       {
@@ -290,28 +576,200 @@ function playStream(
 
         hideOverlay();
 
-        statusText.textContent =
-          "LIVE";
+        setStatus("LIVE");
 
-      },
-      {
-        once: true
+        reconnectAttempts = 0;
+
+      }
+    );
+
+
+    video.addEventListener(
+      "error",
+      () => {
+
+        isStarting = false;
+
+        reconnect(
+          "Video connection lost."
+        );
+
       }
     );
 
   }
 
 
+  // ====================================================
+  // UNSUPPORTED
+  // ====================================================
+
   else {
+
+    isStarting = false;
+
 
     showOverlay(
       "HLS unsupported",
       "This browser cannot play HLS."
     );
 
+
+    setStatus("ERROR");
+
   }
 
 }
+
+
+// ======================================================
+// VIDEO EVENTS
+// ======================================================
+
+
+// ------------------------------------------------------
+// PLAYING
+// ------------------------------------------------------
+
+video.addEventListener(
+  "playing",
+  () => {
+
+    clearTimeout(stallTimer);
+
+    hideOverlay();
+
+    setStatus("LIVE");
+
+    reconnectAttempts = 0;
+
+  }
+);
+
+
+// ------------------------------------------------------
+// WAITING
+// ------------------------------------------------------
+
+video.addEventListener(
+  "waiting",
+  () => {
+
+    console.log(
+      "Video waiting/buffering..."
+    );
+
+
+    setStatus(
+      "BUFFERING"
+    );
+
+
+    clearTimeout(stallTimer);
+
+
+    stallTimer =
+      setTimeout(() => {
+
+        if (
+          video.readyState < 3 &&
+          !video.paused
+        ) {
+
+          console.log(
+            "Buffer stall detected"
+          );
+
+
+          reconnect(
+            "Buffering for too long..."
+          );
+
+        }
+
+      }, 6000);
+
+  }
+);
+
+
+// ------------------------------------------------------
+// STALLED
+// ------------------------------------------------------
+
+video.addEventListener(
+  "stalled",
+  () => {
+
+    console.log(
+      "Video stalled"
+    );
+
+
+    setStatus(
+      "BUFFERING"
+    );
+
+
+    clearTimeout(stallTimer);
+
+
+    stallTimer =
+      setTimeout(() => {
+
+        if (
+          video.readyState < 3 &&
+          !video.paused
+        ) {
+
+          reconnect(
+            "Stream stalled. Reconnecting..."
+          );
+
+        }
+
+      }, 6000);
+
+  }
+);
+
+
+// ------------------------------------------------------
+// CAN PLAY
+// ------------------------------------------------------
+
+video.addEventListener(
+  "canplay",
+  () => {
+
+    if (!video.paused) {
+
+      setStatus("LIVE");
+
+    }
+
+  }
+);
+
+
+// ------------------------------------------------------
+// ENDED
+// ------------------------------------------------------
+
+video.addEventListener(
+  "ended",
+  () => {
+
+    if (currentUrl) {
+
+      reconnect(
+        "Live stream ended unexpectedly."
+      );
+
+    }
+
+  }
+);
 
 
 // ======================================================
@@ -489,7 +947,7 @@ const database =
 const viewerCountElement =
   document.getElementById(
     "viewerCount"
-);
+  );
 
 
 const viewerRef =
