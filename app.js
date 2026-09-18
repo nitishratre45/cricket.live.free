@@ -173,7 +173,11 @@ function playStream(
 
       lowLatencyMode: false,
 
-      maxBufferLength: 25,`r`n      maxMaxBufferLength: 40,`r`n      liveSyncDurationCount: 3,`r`n      liveMaxLatencyDurationCount: 6,`r`n      maxBufferHole: 0.5
+      maxBufferLength: 25,
+      maxMaxBufferLength: 40,
+      liveSyncDurationCount: 3,
+      liveMaxLatencyDurationCount: 6,
+      maxBufferHole: 0.5
 
     });
 
@@ -529,5 +533,6 @@ database
 // ======================================================
 
 loadMatches();
+
 
 
