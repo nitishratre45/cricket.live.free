@@ -9,7 +9,7 @@
 // ======================================================
 
 const TEST_STREAM =
-  "https://optical-named-woods-contracts.trycloudflare.com/live/index.m3u8";
+  "https://test-streams.mux.dev/test_001/stream.m3u8";
 
 
 // ======================================================
@@ -501,7 +501,7 @@ function playStream(
             console.log(error);
 
             reconnect(
-              "Media error â€” reconnecting..."
+              "Media error — reconnecting..."
             );
 
           }
@@ -791,7 +791,7 @@ function createMatchCard(match) {
     <div class="match-top">
 
       <span class="live-label">
-        ðŸ”´ ${match.status}
+        ${match.status}
       </span>
 
       <span class="match-league">
@@ -828,7 +828,7 @@ function createMatchCard(match) {
 
 
     <button class="watch-button" type="button" aria-label="Watch ${match.team1} versus ${match.team2} live">
-      â–¶ Watch Live
+      Watch Live
     </button>
 
   `;
@@ -1027,7 +1027,7 @@ async function legacyScoreUpdate() {
     // BATTING TEAM
     setText(
       "battingTeam",
-      battingTeam || "—"
+      battingTeam || "�"
     );
 
     // SCORE
@@ -1058,7 +1058,7 @@ async function legacyScoreUpdate() {
     );
 
     // TARGET
-    let target = "—";
+    let target = "�";
 
     if (scores.length >= 2) {
       const previous =
@@ -1074,10 +1074,10 @@ async function legacyScoreUpdate() {
     );
 
     // REQUIRED RATE
-    let required = "—";
+    let required = "�";
 
     if (
-      target !== "—" &&
+      target !== "�" &&
       Number(target) > runs &&
       overs < 20
     ) {
@@ -1205,7 +1205,7 @@ database
 
 
       viewerCountElement.textContent =
-        `ðŸ‘ ${count} Watching`;
+        `${count} Watching`
 
     }
   );
@@ -1445,7 +1445,7 @@ async function legacyDetailedScoreUpdate() {
 
     /* TARGET */
 
-    let target = "—";
+    let target = "�";
 
     if (scores.length >= 2) {
 
@@ -1464,10 +1464,10 @@ async function legacyDetailedScoreUpdate() {
 
     /* REQUIRED RATE */
 
-    let required = "—";
+    let required = "�";
 
     if (
-      target !== "—" &&
+      target !== "�" &&
       Number(target) > runs
     ) {
 
@@ -1728,6 +1728,11 @@ function showLiveScoreboard(match) {
 }
 
 async function updateLiveScore() {
+  // Live Server (127.0.0.1:5500) does not provide Vercel /api routes.
+  // Skip the API call locally to avoid repeated 404 console errors.
+  if (window.__CRX_LOCAL_STATIC_SERVER__) {
+    return;
+  }
   try {
     const response = await fetch("/api/live-score", {
       cache: "no-store"
@@ -1876,8 +1881,8 @@ setInterval(updateLiveScore, 60 * 1000);
 
     soundToggle.textContent =
       muted
-        ? "🔇 Sound off"
-        : "🔊 Sound on";
+        ? "?? Sound off"
+        : "?? Sound on";
 
     soundToggle.setAttribute(
       "aria-pressed",
@@ -1994,4 +1999,305 @@ setInterval(updateLiveScore, 60 * 1000);
     startStartupMatch(true);
   }
 
+})();
+
+
+/* =========================================================
+   CRICKET LIVE ? MATCH STATUS UI PATCH #2
+   Fixes:
+   - Mojibake emoji
+   - Upcoming match showing Watch Live
+   - Finished match showing Watch Live
+   - Match-card state styling
+   - Preserves existing HLS/Firebase/API logic
+   ========================================================= */
+
+(function premiumMatchStatusPatch() {
+  "use strict";
+
+  const STATUS_SELECTOR = ".match-card";
+
+  function normalizeBrokenText(root = document) {
+    const walker = document.createTreeWalker(
+      root,
+      NodeFilter.SHOW_TEXT
+    );
+
+    const replacements = {
+      "????": "\u{1F441}",
+      "????": "\u{1F534}",
+      "???": "\u25B6",
+      "???": "\u2715",
+      "???": "\u2713",
+      "???": "\u26A1"
+    };
+
+    const nodes = [];
+
+    while (walker.nextNode()) {
+      nodes.push(walker.currentNode);
+    }
+
+    nodes.forEach(node => {
+      let value = node.nodeValue;
+
+      Object.entries(replacements).forEach(([broken, fixed]) => {
+        value = value.split(broken).join(fixed);
+      });
+
+      if (value !== node.nodeValue) {
+        node.nodeValue = value;
+      }
+    });
+  }
+
+  function getMatchFromCard(card) {
+    if (!Array.isArray(window.matches) && typeof matches === "undefined") {
+      return null;
+    }
+
+    const sourceMatches =
+      Array.isArray(window.matches)
+        ? window.matches
+        : matches;
+
+    const cardText = card.textContent
+      .toLowerCase()
+      .replace(/\s+/g, " ");
+
+    return sourceMatches.find(match => {
+      const team1 = String(match.team1 || "").toLowerCase();
+      const team2 = String(match.team2 || "").toLowerCase();
+
+      return (
+        team1 &&
+        team2 &&
+        cardText.includes(team1) &&
+        cardText.includes(team2)
+      );
+    }) || null;
+  }
+
+  function applyMatchState(card, match) {
+    if (!match) return;
+
+    const status = String(match.status || "")
+      .trim()
+      .toLowerCase();
+
+    const button =
+      card.querySelector("button") ||
+      card.querySelector(".watch-btn") ||
+      card.querySelector(".watch-live");
+
+    if (!button) return;
+
+    card.dataset.matchStatus = status;
+
+    card.classList.remove(
+      "match-is-live",
+      "match-is-upcoming",
+      "match-is-finished"
+    );
+
+    if (status === "live") {
+      card.classList.add("match-is-live");
+
+      button.disabled = false;
+      button.removeAttribute("aria-disabled");
+      button.textContent = "\u25B6 Watch Live";
+
+      return;
+    }
+
+    if (status === "upcoming") {
+      card.classList.add("match-is-upcoming");
+
+      /*
+       * Clone the button.
+       * This removes the old inline/event listeners attached
+       * by the existing match-card renderer.
+       */
+      if (
+        button.disabled &&
+        button.getAttribute("aria-disabled") === "true" &&
+        button.textContent.trim() === "Starts Soon"
+      ) {
+        return;
+      }
+
+      const cleanButton = button.cloneNode(true);
+
+      cleanButton.disabled = true;
+      cleanButton.setAttribute("aria-disabled", "true");
+      cleanButton.removeAttribute("onclick");
+      cleanButton.textContent = "Starts Soon";
+
+      button.replaceWith(cleanButton);
+
+      return;
+    }
+
+    if (
+      status === "finished" ||
+      status === "complete" ||
+      status === "completed"
+    ) {
+      card.classList.add("match-is-finished");
+
+      if (
+        button.disabled &&
+        button.getAttribute("aria-disabled") === "true" &&
+        button.textContent.trim() === "Finished"
+      ) {
+        return;
+      }
+
+      const cleanButton = button.cloneNode(true);
+
+      cleanButton.disabled = true;
+      cleanButton.setAttribute("aria-disabled", "true");
+      cleanButton.removeAttribute("onclick");
+      cleanButton.textContent = "Finished";
+
+      button.replaceWith(cleanButton);
+    }
+  }
+
+  function refreshMatchCards() {
+    normalizeBrokenText();
+
+    const cards = document.querySelectorAll(STATUS_SELECTOR);
+
+    cards.forEach(card => {
+      const match = getMatchFromCard(card);
+
+      if (match) {
+        applyMatchState(card, match);
+      }
+    });
+  }
+
+  function start() {
+    refreshMatchCards();
+
+    const grid = document.getElementById("matchesGrid");
+
+    if (!grid) return;
+
+    const observer = new MutationObserver(() => {
+      refreshMatchCards();
+    });
+
+    observer.observe(grid, {
+      childList: true,
+      subtree: true
+    });
+
+    /*
+     * Existing app code can re-render matches after filters,
+     * refreshes or state changes, so perform lightweight
+     * synchronization periodically.
+     */
+    setInterval(refreshMatchCards, 1500);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, {
+      once: true
+    });
+  } else {
+    start();
+  }
+})();
+
+/* =========================================================
+   CRX V3 � MATCH CARD VISUAL ADAPTER
+   ========================================================= */
+
+(() => {
+  const enhanceMatchCardsV3 = () => {
+    const cards = document.querySelectorAll("#matchesGrid .match-card");
+
+    cards.forEach((card) => {
+      const text = (card.textContent || "").toLowerCase();
+
+      card.classList.toggle(
+        "crx-v3-live-card",
+        text.includes("live")
+      );
+
+      card.classList.toggle(
+        "crx-v3-upcoming-card",
+        text.includes("upcoming") ||
+        text.includes("starts soon")
+      );
+
+      const buttons = card.querySelectorAll("button");
+
+      buttons.forEach((button) => {
+        const label = (button.textContent || "")
+          .trim()
+          .toLowerCase();
+
+        if (label.includes("watch")) {
+          button.classList.add("crx-v3-watch-button");
+        }
+
+        if (
+          label.includes("starts") ||
+          label.includes("finished")
+        ) {
+          button.classList.add("crx-v3-disabled-button");
+        }
+      });
+    });
+  };
+
+  const bootV3 = () => {
+    enhanceMatchCardsV3();
+
+    const grid = document.getElementById("matchesGrid");
+
+    if (grid) {
+      const observer = new MutationObserver(() => {
+        enhanceMatchCardsV3();
+      });
+
+      observer.observe(grid, {
+        childList: true,
+        subtree: true
+      });
+    }
+
+    window.setTimeout(enhanceMatchCardsV3, 500);
+    window.setTimeout(enhanceMatchCardsV3, 1500);
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootV3, {
+      once: true
+    });
+  } else {
+    bootV3();
+  }
+})();
+/* =========================================================
+   CRX LOCAL DEV GUARD
+   Prevent Live Server from spamming /api/live-score 404s
+   ========================================================= */
+
+(() => {
+  const isLocalStaticServer =
+    location.hostname === "127.0.0.1" ||
+    location.hostname === "localhost";
+
+  const isLiveServerPort =
+    location.port === "5500" ||
+    location.port === "5501" ||
+    location.port === "3000";
+
+  if (isLocalStaticServer && isLiveServerPort) {
+    window.__CRX_LOCAL_STATIC_SERVER__ = true;
+  }
 })();
