@@ -1205,7 +1205,7 @@ database
 
 
       viewerCountElement.textContent =
-        `ðŸ‘ ${count} Watching`;
+        `${count} Watching`;
 
     }
   );
