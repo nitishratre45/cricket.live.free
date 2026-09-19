@@ -791,7 +791,7 @@ function createMatchCard(match) {
     <div class="match-top">
 
       <span class="live-label">
-        ðŸ”´ ${match.status}
+         ${match.status}
       </span>
 
       <span class="match-league">
