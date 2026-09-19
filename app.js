@@ -31,7 +31,7 @@ const matches = [
 
     score2: "",
 
-    status: "upcoming",
+    status: "live",
 
     stream: TEST_STREAM
 
