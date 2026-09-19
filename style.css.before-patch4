@@ -3047,3 +3047,1084 @@ body::before {
     transform: none;
   }
 }
+
+/* =========================================================
+   CRICKET LIVE ï¿½ PREMIUM STREAMING UI PATCH
+   Visual layer only ï¿½ HLS/Firebase/API logic untouched
+   ========================================================= */
+
+:root {
+  --bg-main: #05070b;
+  --bg-card: #0b0f16;
+  --bg-card-2: #10151e;
+  --border: rgba(255,255,255,.09);
+  --border-hover: rgba(255,255,255,.18);
+  --text-main: #f5f7fa;
+  --text-muted: #8e98a8;
+  --accent: #19e68c;
+  --accent-2: #0ed57f;
+  --danger: #ff3b4f;
+  --warning: #ffb020;
+  --shadow: 0 20px 60px rgba(0,0,0,.38);
+  --radius-xl: 24px;
+  --radius-lg: 18px;
+  --radius-md: 14px;
+}
+
+/* ---------- GLOBAL ---------- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(25,230,140,.08), transparent 32%),
+    linear-gradient(180deg, #05070b 0%, #070a10 45%, #05070b 100%);
+  color: var(--text-main);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 80%);
+}
+
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- HEADER ---------- */
+
+header,
+.site-header,
+.navbar {
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  background: rgba(5,7,11,.78) !important;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+nav a {
+  transition:
+    color .2s ease,
+    opacity .2s ease,
+    transform .2s ease;
+}
+
+nav a:hover {
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+/* ---------- HERO ---------- */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 430px;
+  display: flex;
+  align-items: center;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  width: 620px;
+  height: 620px;
+  right: -180px;
+  top: -260px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(25,230,140,.16),
+    rgba(25,230,140,0) 68%
+  );
+  pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  left: -240px;
+  bottom: -300px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(30,110,255,.08),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.hero h1 {
+  letter-spacing: -1.5px;
+  line-height: .98;
+}
+
+.hero p {
+  color: var(--text-muted);
+}
+
+/* ---------- SECTION HEADINGS ---------- */
+
+section {
+  position: relative;
+}
+
+section > h2,
+.section-title {
+  letter-spacing: -.5px;
+}
+
+section > h2::after,
+.section-title::after {
+  content: "";
+  display: inline-block;
+  width: 34px;
+  height: 3px;
+  margin-left: 10px;
+  margin-bottom: 4px;
+  border-radius: 99px;
+  background: var(--accent);
+  box-shadow: 0 0 18px rgba(25,230,140,.45);
+}
+
+/* ---------- PLAYER ---------- */
+
+.player-section,
+.video-section,
+.stream-section {
+  position: relative;
+}
+
+.player-wrapper,
+.video-container,
+.player-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: #000;
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.5),
+    0 0 0 1px rgba(255,255,255,.025);
+}
+
+video,
+#player {
+  display: block;
+  width: 100%;
+  background: #000;
+}
+
+.player-wrapper::after,
+.video-container::after,
+.player-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.16),
+      transparent 25%,
+      transparent 72%,
+      rgba(0,0,0,.28)
+    );
+}
+
+.player-toolbar,
+.player-controls {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* ---------- LIVE BADGE ---------- */
+
+.live-badge,
+.live-label,
+.status-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+
+.live-badge::before,
+.status-live::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff304f;
+  box-shadow: 0 0 0 4px rgba(255,48,79,.12);
+  animation: livePulse 1.6s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: .55;
+    transform: scale(.78);
+  }
+}
+
+/* ---------- CARDS ---------- */
+
+.card,
+.info-card,
+.match-card,
+.tournament-card,
+.score-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.045),
+      rgba(255,255,255,.018)
+    ) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 12px 38px rgba(0,0,0,.18);
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease,
+    background .25s ease;
+}
+
+.card:hover,
+.info-card:hover,
+.match-card:hover,
+.tournament-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-hover) !important;
+  box-shadow:
+    0 22px 55px rgba(0,0,0,.28),
+    0 0 35px rgba(25,230,140,.035);
+}
+
+/* ---------- MATCH CARDS ---------- */
+
+.match-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.match-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      120deg,
+      rgba(25,230,140,.045),
+      transparent 45%
+    );
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+
+.match-card:hover::before {
+  opacity: 1;
+}
+
+.match-card button,
+.watch-btn,
+.watch-live,
+button.primary {
+  border: 0;
+  border-radius: 12px;
+  font-weight: 800;
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    filter .18s ease;
+}
+
+.watch-btn:hover,
+.watch-live:hover,
+button.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(25,230,140,.2);
+  filter: brightness(1.06);
+}
+
+.watch-btn:active,
+.watch-live:active,
+button.primary:active {
+  transform: translateY(0);
+}
+
+/* ---------- SCOREBOARD ---------- */
+
+#liveScoreboard {
+  position: relative;
+  overflow: hidden;
+  margin-top: 22px;
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(
+      circle at 100% 0,
+      rgba(25,230,140,.09),
+      transparent 35%
+    ),
+    linear-gradient(
+      145deg,
+      #0d121a,
+      #080b11
+    );
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: var(--shadow);
+}
+
+#liveScoreboard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.025),
+      transparent
+    );
+}
+
+#teamScore {
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -2px;
+}
+
+#overs,
+#inningsText,
+#currentRunRate,
+#requiredRate {
+  color: var(--text-muted);
+}
+
+#strikerName,
+#nonStrikerName,
+#bowlerName {
+  font-weight: 800;
+}
+
+#strikerRuns,
+#nonStrikerRuns {
+  font-weight: 900;
+}
+
+/* ---------- QUICK SCORE ---------- */
+
+.quick-score {
+  position: sticky;
+  top: 78px;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: fit-content;
+  max-width: calc(100% - 24px);
+  margin: 12px auto;
+  padding: 9px 15px;
+  border-radius: 999px;
+  background: rgba(8,12,17,.86);
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: 0 12px 30px rgba(0,0,0,.25);
+  backdrop-filter: blur(16px);
+}
+
+#quickScoreText {
+  font-weight: 900;
+}
+
+#quickOvers {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* ---------- SEARCH / FILTERS ---------- */
+
+input[type="search"],
+input[type="text"] {
+  background: rgba(255,255,255,.045) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  outline: none;
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+input[type="search"]:focus,
+input[type="text"]:focus {
+  border-color: rgba(25,230,140,.55) !important;
+  box-shadow: 0 0 0 4px rgba(25,230,140,.08);
+  background: rgba(255,255,255,.065) !important;
+}
+
+.filter-btn,
+.filter-chip,
+.tab-btn {
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.035);
+  color: #aab3c1;
+  border-radius: 999px;
+  transition: all .2s ease;
+}
+
+.filter-btn:hover,
+.filter-chip:hover,
+.tab-btn:hover,
+.filter-btn.active,
+.filter-chip.active,
+.tab-btn.active {
+  color: #fff;
+  border-color: rgba(25,230,140,.42);
+  background: rgba(25,230,140,.09);
+}
+
+/* ---------- VIEWER COUNT ---------- */
+
+#viewerCount {
+  color: #aeb7c5;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ---------- TOAST ---------- */
+
+.toast,
+#toast {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: rgba(12,16,23,.9) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  box-shadow: 0 18px 45px rgba(0,0,0,.35);
+  border-radius: 14px !important;
+}
+
+/* ---------- BUTTONS ---------- */
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---------- FOOTER ---------- */
+
+footer {
+  border-top: 1px solid rgba(255,255,255,.07);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.015),
+      rgba(0,0,0,.12)
+    );
+}
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 768px) {
+
+  .hero {
+    min-height: 350px;
+  }
+
+  .hero h1 {
+    font-size: clamp(38px, 12vw, 62px);
+  }
+
+  .player-wrapper,
+  .video-container,
+  .player-container {
+    border-radius: 16px;
+  }
+
+  #liveScoreboard {
+    border-radius: 18px;
+  }
+
+  .card,
+  .info-card,
+  .match-card,
+  .tournament-card {
+    border-radius: 15px !important;
+  }
+
+  .quick-score {
+    top: 64px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  body {
+    font-size: 14px;
+  }
+
+  .hero {
+    min-height: 310px;
+  }
+
+  .player-wrapper,
+  .video-container,
+  .player-container {
+    border-radius: 12px;
+  }
+
+  #liveScoreboard {
+    margin-top: 14px;
+    border-radius: 15px;
+  }
+
+  #teamScore {
+    font-size: 38px;
+    letter-spacing: -1.5px;
+  }
+
+  .quick-score {
+    max-width: calc(100% - 20px);
+    padding: 8px 12px;
+  }
+}
+
+/* ---------- REDUCED MOTION ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+/* =========================================================
+   CRICKET LIVE — PREMIUM STREAMING HOMEPAGE
+   BIG PATCH #4
+   ========================================================= */
+
+:root {
+  --cl-bg: #050608;
+  --cl-panel: #0b0d11;
+  --cl-panel-2: #101318;
+  --cl-border: rgba(255,255,255,.075);
+  --cl-border-strong: rgba(255,255,255,.13);
+  --cl-text: #f4f6f8;
+  --cl-muted: #858e9d;
+  --cl-green: #18e58a;
+  --cl-red: #ff3d52;
+  --cl-yellow: #ffb52e;
+  --cl-radius: 20px;
+}
+
+/* ---------- MAIN BACKGROUND ---------- */
+
+body {
+  background:
+    radial-gradient(
+      circle at 50% -15%,
+      rgba(24,229,138,.075),
+      transparent 34%
+    ),
+    #050608;
+}
+
+/* ---------- HERO ---------- */
+
+.hero {
+  min-height: 480px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  background:
+    radial-gradient(
+      ellipse at 70% 40%,
+      rgba(24,229,138,.075),
+      transparent 40%
+    ),
+    linear-gradient(
+      180deg,
+      #050608 0%,
+      #07090d 100%
+    );
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  right: -280px;
+  top: -330px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(24,229,138,.12),
+      transparent 68%
+    );
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  width: min(1180px, calc(100% - 40px));
+  margin: auto;
+}
+
+.hero h1 {
+  max-width: 780px;
+  font-size: clamp(48px, 7vw, 88px);
+  font-weight: 950;
+  letter-spacing: -4px;
+  line-height: .92;
+}
+
+.hero p {
+  max-width: 650px;
+  color: #929aa8;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* ---------- LIVE HERO LABEL ---------- */
+
+.hero .live-badge,
+.hero .status-live {
+  padding: 7px 13px;
+  background: rgba(255,61,82,.08);
+  border: 1px solid rgba(255,61,82,.18);
+  color: #ff6374;
+}
+
+/* ---------- PLAYER AREA ---------- */
+
+.player-section,
+.video-section,
+.stream-section {
+  width: min(1180px, calc(100% - 32px));
+  margin: -80px auto 0;
+  position: relative;
+  z-index: 10;
+}
+
+.player-wrapper,
+.video-container,
+.player-container {
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: #000;
+  box-shadow:
+    0 35px 100px rgba(0,0,0,.62),
+    0 0 0 1px rgba(255,255,255,.025);
+}
+
+/* Player aspect ratio */
+
+.player-wrapper video,
+.video-container video,
+.player-container video {
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+}
+
+/* ---------- PLAYER TOP STATUS ---------- */
+
+.player-wrapper::before,
+.video-container::before,
+.player-container::before {
+  content: "LIVE";
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 4;
+  padding: 6px 10px;
+  border-radius: 7px;
+  background: rgba(255,39,62,.9);
+  color: white;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  box-shadow: 0 6px 20px rgba(255,39,62,.2);
+}
+
+/* ---------- STREAM INFO ---------- */
+
+.now-playing,
+.now-streaming,
+.stream-info {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.045),
+      rgba(255,255,255,.018)
+    );
+  border: 1px solid var(--cl-border);
+}
+
+.now-playing strong,
+.now-streaming strong {
+  font-size: 15px;
+  font-weight: 850;
+}
+
+/* ---------- SECTION CONTAINER ---------- */
+
+main > section,
+section.matches-section,
+section.live-matches,
+section.tournaments-section {
+  width: min(1180px, calc(100% - 32px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---------- SECTION SPACING ---------- */
+
+section {
+  margin-top: 64px;
+  margin-bottom: 64px;
+}
+
+/* ---------- SECTION HEADER ---------- */
+
+section h2 {
+  font-size: clamp(24px, 4vw, 34px);
+  font-weight: 900;
+  letter-spacing: -.9px;
+}
+
+section h2::after {
+  content: "";
+  display: block;
+  width: 38px;
+  height: 3px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: var(--cl-green);
+  box-shadow: 0 0 16px rgba(24,229,138,.4);
+}
+
+/* ---------- MATCH GRID ---------- */
+
+#matchesGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* ---------- MATCH CARD ---------- */
+
+.match-card {
+  min-height: 215px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.045),
+      rgba(255,255,255,.015)
+    ) !important;
+  border: 1px solid var(--cl-border) !important;
+  border-radius: var(--cl-radius) !important;
+  box-shadow:
+    0 15px 40px rgba(0,0,0,.18);
+}
+
+.match-card:hover {
+  border-color: var(--cl-border-strong) !important;
+  transform: translateY(-4px);
+}
+
+/* Live card */
+
+.match-card.match-is-live {
+  border-color: rgba(24,229,138,.22) !important;
+  box-shadow:
+    0 20px 55px rgba(0,0,0,.3),
+    inset 0 0 45px rgba(24,229,138,.025);
+}
+
+/* Upcoming */
+
+.match-card.match-is-upcoming {
+  opacity: .88;
+}
+
+/* Finished */
+
+.match-card.match-is-finished {
+  opacity: .62;
+}
+
+/* ---------- TEAM NAMES ---------- */
+
+.match-card .team,
+.match-card .team-name {
+  font-size: 17px;
+  font-weight: 850;
+  letter-spacing: -.3px;
+}
+
+/* ---------- STATUS ---------- */
+
+.match-card .live-label {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+
+.match-is-live .live-label {
+  color: var(--cl-red);
+}
+
+.match-is-upcoming .live-label {
+  color: var(--cl-yellow);
+}
+
+.match-is-finished .live-label {
+  color: var(--cl-muted);
+}
+
+/* ---------- MATCH BUTTON ---------- */
+
+.match-card button {
+  width: 100%;
+  min-height: 43px;
+  margin-top: 15px;
+  border-radius: 11px;
+  border: 1px solid rgba(24,229,138,.2);
+  background: rgba(24,229,138,.1);
+  color: #cffff0;
+  font-weight: 850;
+}
+
+.match-card.match-is-upcoming button {
+  background: rgba(255,255,255,.035);
+  border-color: rgba(255,255,255,.07);
+  color: #737c89;
+}
+
+.match-card.match-is-finished button {
+  background: rgba(255,255,255,.025);
+  border-color: rgba(255,255,255,.05);
+  color: #68717d;
+}
+
+/* ---------- SCOREBOARD ---------- */
+
+#liveScoreboard {
+  width: min(1180px, calc(100% - 32px));
+  margin: 26px auto 0;
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 85% 10%,
+      rgba(24,229,138,.08),
+      transparent 30%
+    ),
+    #0a0d12;
+  border: 1px solid rgba(255,255,255,.09);
+  box-shadow: 0 25px 70px rgba(0,0,0,.35);
+}
+
+/* ---------- EMPTY SCORE ---------- */
+
+.score-empty,
+.empty-score {
+  padding: 55px 20px;
+  text-align: center;
+  color: var(--cl-muted);
+}
+
+.empty-score-icon {
+  display: none !important;
+}
+
+/* ---------- SEARCH ---------- */
+
+input[type="search"],
+input[type="text"] {
+  min-height: 44px;
+  padding: 0 14px;
+  background: rgba(255,255,255,.035) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 12px !important;
+}
+
+input[type="search"]:focus,
+input[type="text"]:focus {
+  border-color: rgba(24,229,138,.4) !important;
+  box-shadow: 0 0 0 4px rgba(24,229,138,.06);
+}
+
+/* ---------- TOURNAMENT / INFO CARDS ---------- */
+
+.tournament-card,
+.info-card,
+.card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.04),
+      rgba(255,255,255,.015)
+    ) !important;
+  border: 1px solid var(--cl-border) !important;
+  border-radius: 18px !important;
+}
+
+/* ---------- FOOTER ---------- */
+
+footer {
+  margin-top: 100px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  background: #040507;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  #matchesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero {
+    min-height: 390px;
+  }
+
+  .player-section,
+  .video-section,
+  .stream-section {
+    margin-top: -45px;
+  }
+}
+
+@media (max-width: 600px) {
+
+  .hero {
+    min-height: 350px;
+  }
+
+  .hero-content {
+    width: calc(100% - 28px);
+  }
+
+  .hero h1 {
+    font-size: clamp(42px, 13vw, 64px);
+    letter-spacing: -2.5px;
+  }
+
+  .hero p {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .player-section,
+  .video-section,
+  .stream-section {
+    width: calc(100% - 20px);
+    margin-top: -30px;
+  }
+
+  .player-wrapper,
+  .video-container,
+  .player-container {
+    border-radius: 14px;
+  }
+
+  #liveScoreboard {
+    width: calc(100% - 20px);
+    border-radius: 16px;
+  }
+
+  #matchesGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  main > section,
+  section.matches-section,
+  section.live-matches,
+  section.tournaments-section {
+    width: calc(100% - 20px);
+  }
+
+  section {
+    margin-top: 44px;
+    margin-bottom: 44px;
+  }
+
+  .match-card {
+    min-height: 185px;
+    padding: 16px;
+  }
+}
+
+/* ---------- REDUCED MOTION ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .match-card {
+    transition: none !important;
+  }
+
+  .match-card:hover {
+    transform: none !important;
+  }
+}

@@ -10,7 +10,7 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>CricketLive</title>
+  <title>CRICKET LIVE — Watch Cricket Live</title>
 
   <link
     rel="stylesheet"
@@ -32,7 +32,7 @@
 <header class="topbar">
 
   <div class="brand">
-    🏏 <span>CRICKET</span>LIVE
+     <span>CRICKET</span>LIVE
   </div>
 
 
@@ -83,7 +83,7 @@
       <div class="hero-text">
 
         <p class="tag">
-          🏏 CRICKET STREAMING
+           CRICKET STREAMING
         </p>
 
 
@@ -106,17 +106,11 @@
           href="#live"
           class="hero-button"
         >
-          🔴 Watch Live
+           Watch Live
         </a>
 
       </div>
-
-
-      <div class="hero-ball">
-        🏏
-      </div>
-
-    </div>
+</div>
 
   </section>
 
@@ -199,7 +193,7 @@
         </div>
 
         <div class="big-play">
-          ▶
+          
         </div>
 
 
@@ -218,7 +212,7 @@
             class="watch-live-button"
             type="button"
           >
-            ▶ WATCH LIVE
+             WATCH LIVE
           </button>
 
         </div>
@@ -276,7 +270,7 @@
           aria-pressed="false"
           aria-label="Unmute live stream"
         >
-          🔇 Sound off
+           Sound off
         </button>
 
         <button
@@ -303,7 +297,7 @@
          NOW PLAYING
     ================================================== -->
 
-    
+
     <div class="now-playing">
   <div>
     <small>NOW PLAYING</small>
@@ -369,7 +363,7 @@
             class="team-logo"
             id="battingTeamLogo"
           >
-            🏏
+            
           </div>
 
 
@@ -462,7 +456,7 @@
               <span id="strikerName">
                 —
               </span>
-              <b>★</b>
+              <b></b>
             </span>
 
             <small>
@@ -566,7 +560,7 @@
       class="score-empty-state"
       aria-live="polite"
     >
-      <span class="empty-score-icon">--</span>
+
       <div>
         <small>LIVE SCORE</small>
         <strong>Score currently unavailable</strong>
@@ -671,63 +665,24 @@
 
 
     <div class="tournament-grid">
+      <article class="tournament-card">
+        <span class="tournament-kicker">FORMAT</span>
+        <h3>International Cricket</h3>
+        <p>Test, ODI and T20I matches</p>
+      </article>
 
+      <article class="tournament-card">
+        <span class="tournament-kicker">FORMAT</span>
+        <h3>T20 Cricket</h3>
+        <p>Domestic and international T20</p>
+      </article>
 
-      <div class="tournament-card">
-
-        <div>
-          🏆
-        </div>
-
-        <h3>
-          International Cricket
-        </h3>
-
-        <p>
-          Test • ODI • T20I
-        </p>
-
-      </div>
-
-
-
-      <div class="tournament-card">
-
-        <div>
-          🏏
-        </div>
-
-        <h3>
-          T20 Cricket
-        </h3>
-
-        <p>
-          Domestic & International
-        </p>
-
-      </div>
-
-
-
-      <div class="tournament-card">
-
-        <div>
-          🌍
-        </div>
-
-        <h3>
-          World Cricket
-        </h3>
-
-        <p>
-          Matches from around the world
-        </p>
-
-      </div>
-
-
+      <article class="tournament-card">
+        <span class="tournament-kicker">GLOBAL</span>
+        <h3>World Cricket</h3>
+        <p>Matches from around the world</p>
+      </article>
     </div>
-
   </section>
 
 
@@ -821,10 +776,10 @@
   class="mobile-bottom-nav"
   aria-label="Mobile navigation"
 >
-  <a class="is-active" href="#top" data-mobile-nav="home"><span>^</span>Home</a>
-  <a href="#live" data-mobile-nav="live"><span>o</span>Live</a>
-  <a href="#matches" data-mobile-nav="matches"><span>+</span>Matches</a>
-  <a href="#liveScoreboard" data-mobile-nav="score"><span>#</span>Score</a>
+  <a class="is-active" href="#top" data-mobile-nav="home">Home</a>
+  <a href="#live" data-mobile-nav="live">Live</a>
+  <a href="#matches" data-mobile-nav="matches">Matches</a>
+  <a href="#liveScoreboard" data-mobile-nav="score">Score</a>
 </nav>
 
 
@@ -837,7 +792,7 @@
 
   <div class="brand">
 
-    🏏 CRICKET<span>LIVE</span>
+     CRICKET<span>LIVE</span>
 
   </div>
 
@@ -1047,32 +1002,6 @@
       });
     });
 
-    const enhanceMatchCards = () => {
-      document.querySelectorAll(".match-card").forEach(card => {
-        if (card.querySelector(".favorite-button")) return;
-        const title = Array.from(card.querySelectorAll(".team-name")).map(item => item.textContent.trim()).join(" vs ");
-        const key = `cricket-live-favorite:${title.toLowerCase()}`;
-        const favorite = document.createElement("button");
-        favorite.type = "button";
-        favorite.className = "favorite-button";
-        favorite.setAttribute("aria-label", `Favorite ${title}`);
-        favorite.setAttribute("aria-pressed", String(localStorage.getItem(key) === "true"));
-        favorite.textContent = "*";
-        if (localStorage.getItem(key) === "true") favorite.classList.add("is-favorite");
-        favorite.addEventListener("click", event => {
-          event.preventDefault();
-          event.stopPropagation();
-          const active = favorite.classList.toggle("is-favorite");
-          favorite.setAttribute("aria-pressed", String(active));
-          localStorage.setItem(key, String(active));
-          showToast(active ? "Added to favorites" : "Removed from favorites");
-        });
-        card.appendChild(favorite);
-      });
-    };
-
-    matchesGrid && new MutationObserver(enhanceMatchCards).observe(matchesGrid, { childList: true });
-    enhanceMatchCards();
     observeText(matchTitle);
     observeText(statusText);
     observeText(scoreMatchTitle);
