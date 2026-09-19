@@ -828,7 +828,7 @@ function createMatchCard(match) {
 
 
     <button class="watch-button" type="button" aria-label="Watch ${match.team1} versus ${match.team2} live">
-      â–¶ Watch Live
+       Watch Live
     </button>
 
   `;
