@@ -1529,8 +1529,8 @@ async function legacyDetailedScoreUpdate() {
 // LIVE SCOREBOARD - CRICKETDATA CRICSCORE
 // ==========================================
 
-const TARGET_TEAM_1 = "zimbabwe";
-const TARGET_TEAM_2 = "australia";
+const TARGET_TEAM_1 = "india";
+const TARGET_TEAM_2 = "japan";
 
 function normalizeTeamName(name) {
   return String(name || "")
