@@ -1,0 +1,6 @@
+
+# Local backups and snapshots
+*.backup
+*.backup2
+*.before-score-fix
+project_snapshot.txt
