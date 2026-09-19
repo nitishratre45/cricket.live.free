@@ -9,7 +9,7 @@
 // ======================================================
 
 const TEST_STREAM =
-  "https://test-streams.mux.dev/test_001/stream.m3u8";
+  "https://aud-william-restaurant-disabilities.trycloudflare.com/live/index.m3u8";
 
 
 // ======================================================
@@ -21,11 +21,11 @@ const matches = [
   {
     id: 1,
 
-    league: "one t20i",
+    league: "asia cup 2025",
 
-    team1: "india",
+    team1: "ind",
 
-    team2: "japan",
+    team2: "pak",
 
     score1: "",
 
