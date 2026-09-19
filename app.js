@@ -1800,20 +1800,12 @@ updateLiveScore();
 setInterval(updateLiveScore, 60 * 1000);
 
 /* ======================================================
-   LIVE STARTUP EXPERIENCE
-   UI-only adapter for the existing player flow.
+   LIVE PLAYER CONTROLS — CLEAN PATCH
+   Play + Sound + Autoplay
    ====================================================== */
 
 (() => {
-
-  const startupOverlay =
-    document.getElementById("overlay");
-
-  const startupOverlayTitle =
-    document.getElementById("overlayTitle");
-
-  const startupMessage =
-    document.getElementById("message");
+  "use strict";
 
   const watchLiveButton =
     document.getElementById("watchLiveButton");
@@ -1824,32 +1816,88 @@ setInterval(updateLiveScore, 60 * 1000);
   const autoplayPreference =
     document.getElementById("autoplayPreference");
 
-  const startupLiveMatches =
-    matches.filter(match =>
-      String(match.status).toUpperCase() === "LIVE" &&
-      Boolean(match.stream)
-    );
-
-  // Avoid choosing arbitrarily if the existing match list ever has multiple LIVE entries.
-  const startupMatch =
-    startupLiveMatches.length === 1
-      ? startupLiveMatches[0]
-      : null;
-
   const autoplayStorageKey =
     "cricket-live-autoplay";
 
-  let savedAutoplay = null;
+  function updateSoundButton() {
+    if (!soundToggle || !video) return;
 
-  try {
-    savedAutoplay =
-      localStorage.getItem(autoplayStorageKey);
-  } catch (error) {
-    console.warn("Autoplay preference is unavailable.", error);
+    if (video.muted) {
+      soundToggle.textContent = "🔇 Sound off";
+      soundToggle.setAttribute("aria-pressed", "false");
+      soundToggle.setAttribute(
+        "aria-label",
+        "Turn sound on"
+      );
+    } else {
+      soundToggle.textContent = "🔊 Sound on";
+      soundToggle.setAttribute("aria-pressed", "true");
+      soundToggle.setAttribute(
+        "aria-label",
+        "Turn sound off"
+      );
+    }
   }
 
-  const autoplayEnabled =
-    savedAutoplay !== "false";
+  async function playCurrentVideo(withSound = false) {
+    if (!video) return;
+
+    if (!currentUrl) {
+      console.warn("No stream URL loaded.");
+      return;
+    }
+
+    try {
+      video.muted = !withSound;
+
+      await video.play();
+
+      hideOverlay();
+      setStatus("LIVE");
+      updateSoundButton();
+
+    } catch (error) {
+      console.warn(
+        "Video playback blocked:",
+        error
+      );
+
+      if (withSound) {
+        video.muted = true;
+
+        try {
+          await video.play();
+
+          hideOverlay();
+          setStatus("LIVE");
+          updateSoundButton();
+
+        } catch (retryError) {
+          console.warn(
+            "Muted playback also failed:",
+            retryError
+          );
+        }
+      }
+    }
+  }
+
+  let autoplayEnabled = true;
+
+  try {
+    const saved =
+      localStorage.getItem(
+        autoplayStorageKey
+      );
+
+    if (saved === "false") {
+      autoplayEnabled = false;
+    }
+  } catch (error) {
+    console.warn(
+      "Autoplay preference unavailable."
+    );
+  }
 
   if (autoplayPreference) {
     autoplayPreference.checked =
@@ -1861,146 +1909,118 @@ setInterval(updateLiveScore, 60 * 1000);
         try {
           localStorage.setItem(
             autoplayStorageKey,
-            String(autoplayPreference.checked)
+            String(
+              autoplayPreference.checked
+            )
           );
         } catch (error) {
-          console.warn("Autoplay preference could not be saved.", error);
+          console.warn(
+            "Could not save autoplay preference."
+          );
         }
       }
     );
   }
 
-  function setSoundLabel() {
-
-    if (!soundToggle) {
-      return;
-    }
-
-    const muted =
-      Boolean(video.muted);
-
-    soundToggle.textContent =
-      muted
-        ? "?? Sound off"
-        : "?? Sound on";
-
-    soundToggle.setAttribute(
-      "aria-pressed",
-      String(!muted)
-    );
-
-    soundToggle.setAttribute(
-      "aria-label",
-      muted
-        ? "Unmute live stream"
-        : "Mute live stream"
-    );
-
-  }
-
-  function prepareLiveOverlay() {
-
-    if (!startupMatch) {
-
-      startupOverlay
-        ?.querySelector(".live-overlay-badge")
-        ?.setAttribute("hidden", "");
-
-      watchLiveButton?.setAttribute(
-        "hidden",
-        ""
-      );
-
-      soundToggle?.setAttribute(
-        "hidden",
-        ""
-      );
-
-      return;
-
-    }
-
-    startupOverlay?.classList.add(
-      "startup-overlay"
-    );
-
-    if (startupOverlayTitle) {
-      startupOverlayTitle.textContent =
-        "LIVE NOW";
-    }
-
-    if (startupMessage) {
-      startupMessage.textContent =
-        `${startupMatch.team1} vs ${startupMatch.team2} is streaming now.`;
-    }
-
-    watchLiveButton?.removeAttribute(
-      "hidden"
-    );
-
-    soundToggle?.removeAttribute(
-      "hidden"
-    );
-
-    setSoundLabel();
-
-  }
-
-  function startStartupMatch(muted) {
-
-    if (!startupMatch) {
-      return;
-    }
-
-    video.muted =
-      muted;
-
-    setSoundLabel();
-
-    playStream(
-      `${startupMatch.team1} vs ${startupMatch.team2}`,
-      startupMatch.stream
-    );
-
-  }
+  /*
+   * WATCH LIVE
+   */
 
   watchLiveButton?.addEventListener(
     "click",
-    () => {
-      startStartupMatch(false);
-    }
-  );
+    async () => {
 
-  soundToggle?.addEventListener(
-    "click",
-    () => {
-
-      if (!startupMatch) {
+      if (!currentUrl) {
+        console.warn(
+          "No stream URL is currently loaded."
+        );
         return;
       }
 
-      video.muted =
-        !video.muted;
-
-      setSoundLabel();
-
-      if (!currentUrl) {
-        startStartupMatch(
-          video.muted
-        );
-      }
-
+      await playCurrentVideo(true);
     }
   );
 
-  prepareLiveOverlay();
+  /*
+   * SOUND
+   */
 
-  if (startupMatch && autoplayEnabled) {
-    startStartupMatch(true);
+  soundToggle?.addEventListener(
+    "click",
+    async () => {
+
+      if (!video) return;
+
+      if (video.muted) {
+
+        video.muted = false;
+
+        try {
+          await video.play();
+
+          hideOverlay();
+          setStatus("LIVE");
+
+        } catch (error) {
+
+          console.warn(
+            "Unmuted playback blocked:",
+            error
+          );
+
+          video.muted = true;
+        }
+
+      } else {
+
+        video.muted = true;
+      }
+
+      updateSoundButton();
+    }
+  );
+
+  /*
+   * VIDEO EVENTS
+   */
+
+  video?.addEventListener(
+    "play",
+    updateSoundButton
+  );
+
+  video?.addEventListener(
+    "volumechange",
+    updateSoundButton
+  );
+
+  video?.addEventListener(
+    "playing",
+    () => {
+      hideOverlay();
+      setStatus("LIVE");
+      updateSoundButton();
+    }
+  );
+
+  /*
+   * INITIAL STATE
+   */
+
+  updateSoundButton();
+
+  /*
+   * AUTOPLAY MUTED
+   */
+
+  if (
+    autoplayEnabled &&
+    currentUrl
+  ) {
+    playCurrentVideo(false);
   }
 
 })();
-
 
 /* =========================================================
    CRICKET LIVE ? MATCH STATUS UI PATCH #2
@@ -2301,3 +2321,4 @@ setInterval(updateLiveScore, 60 * 1000);
     window.__CRX_LOCAL_STATIC_SERVER__ = true;
   }
 })();
+
